@@ -1,6 +1,6 @@
 function BrowsePage() {
     return (
-        <h1>BrowsePage</h1>
+        <h1>Browse Page</h1>
     )
 }
 
