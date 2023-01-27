@@ -1,0 +1,48 @@
+#algorithm {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: auto 1fr 10rem;
+    grid-gap: 0.5rem;
+    grid-template-areas: 
+        'header header'
+        'code graph'
+        'output graph';
+    width: 100vw;
+    height:100vh;
+    color: #a4a4a4;
+    background-color: #151515;
+}
+
+#algorithm_name {
+    text-align: center;
+    grid-area: header;
+    background-color: #2F3129;
+}
+
+#code-editor {
+    grid-area: code;
+}
+
+#graph-visualisation {
+    grid-area: graph;
+}
+
+#code-output {
+    grid-area: output;
+}
+
+.ace_breakpoint::before {
+    content: '';
+    position: relative;
+    display: inline-block;
+    width: 10px;
+    height: 10px;
+    top: 3.5px;
+    left: -1.5px;
+    border-radius: 5px;
+    background-color: red;
+}
+
+.ace_breakpoint {
+    transform: translate(-10px);
+}
