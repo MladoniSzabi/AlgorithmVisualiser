@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { useParams } from "react-router-dom"
 
 import './AlgorithmPage.css'
+import GraphComponent from "component/GraphComponent";
 import CodeEditorComponent from "component/CodeEditorComponent";
 
 function AlgorithmPage() {
@@ -59,7 +60,9 @@ function AlgorithmPage() {
             <div id="code-editor">
                 <CodeEditorComponent onRunCode={onRunCode}></CodeEditorComponent>
             </div>
-            <div id="graph-visualisation"></div>
+            <div id="graph-visualisation">
+                <GraphComponent></GraphComponent>
+            </div>
             <div id="code-output">{output.map((el, index) => <p key={index}>{el}</p>)}</div>
         </div>
     )
