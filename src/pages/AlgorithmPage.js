@@ -1,3 +1,4 @@
+import React, { useState } from "react";
 import { useParams } from "react-router-dom"
 import AceEditor from 'react-ace'
 import "ace-builds/src-noconflict/mode-javascript";
@@ -9,9 +10,35 @@ import './AlgorithmPage.css'
 function AlgorithmPage() {
 
     const { algorithmName } = useParams()
+    let [output, setOutput] = useState([])
 
-    function onLoad(editor) {
-        console.log(editor)
+    function runCode(code) {
+        let output = []
+        let consoleBackup = {
+            log: console.log,
+            warn: console.warn,
+            error: console.error,
+        }
+
+        console.log = (message, ...other) => {
+
+            output.push(JSON.stringify(message))
+            other.forEach((el) => {output.push(JSON.stringify(el))})
+        }
+        console.warn = console.log
+        console.error = console.log
+
+        eval(code)
+
+        console.log = consoleBackup.log
+        console.warn = consoleBackup.warn
+        console.error = consoleBackup.error
+
+        return output
+    }
+
+    function onRunTriggered(editor) {
+        setOutput(runCode(editor.getValue()))
     }
 
     return (
@@ -22,15 +49,17 @@ function AlgorithmPage() {
                 placeholder="Placeholder Text"
                 mode="javascript"
                 theme="monokai"
-                name="blah2"
-                onLoad={onLoad}
-                // onChange={this.onChange}
                 width="100%"
                 height="100%"
                 fontSize="1rem"
                 showPrintMargin={true}
                 showGutter={true}
                 highlightActiveLine={true}
+                commands={[{
+                    name:"run",
+                    bindKey: {win: "Ctrl-Return", mac:"Cmd-Return"},
+                    exec: onRunTriggered
+                }]}
                 setOptions={{
                     enableBasicAutocompletion: true,
                     enableLiveAutocompletion: true,
@@ -40,7 +69,7 @@ function AlgorithmPage() {
             }}/>
             </div>
             <div id="graph-visualisation"></div>
-            <div id="code-output"></div>
+            <div id="code-output">{output.map((el, index) => <p key={index}>{el}</p>)}</div>
         </div>
     )
 }
