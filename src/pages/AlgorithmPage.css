@@ -31,6 +31,10 @@
     grid-area: output;
 }
 
+#code-output p {
+    margin: 0;
+}
+
 .ace_breakpoint::before {
     content: '';
     position: relative;

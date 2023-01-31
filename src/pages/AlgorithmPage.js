@@ -1,72 +1,63 @@
 import React, { useState } from "react";
 import { useParams } from "react-router-dom"
-import AceEditor from 'react-ace'
-import "ace-builds/src-noconflict/mode-javascript";
-import "ace-builds/src-noconflict/theme-monokai";
-import "ace-builds/src-noconflict/ext-language_tools";
 
 import './AlgorithmPage.css'
+import CodeEditorComponent from "component/CodeEditorComponent";
 
 function AlgorithmPage() {
 
     const { algorithmName } = useParams()
     let [output, setOutput] = useState([])
 
-    function runCode(code) {
-        let output = []
+    function onRunCode(code) {
+        let newOutput = output.slice()
+
+        // Back up console object so that we can restore it later
         let consoleBackup = {
             log: console.log,
             warn: console.warn,
             error: console.error,
         }
 
+        // Overwrite console object so that we can store its output and render it in
+        // the output tab
         console.log = (message, ...other) => {
 
-            output.push(JSON.stringify(message))
-            other.forEach((el) => {output.push(JSON.stringify(el))})
+            newOutput.push(JSON.stringify(message))
+            other.forEach((el) => {newOutput.push(JSON.stringify(el))})
         }
         console.warn = console.log
         console.error = console.log
 
-        eval(code)
+        // Run code in editor
+        //
+        // Normally this is not a good idea because it allows remote code execution,
+        // however we don't have a backend or a way to share code.
+        // All the code will exclusively be stored on the user's computer.
+        // 
+        // Only problem is if the code is copy pasted from a shady source so for this case
+        // it would be a good idea to disable any way of damaging your own computer
+        // Leaking information should not be a problem since we are not storing any
+        // sensitive data.
+        try {
+            eval(code)
+        } catch(error) {
+            newOutput.push(error.toString())
+        } finally {
+            // Restore console object so it works as expected
+            console.log = consoleBackup.log
+            console.warn = consoleBackup.warn
+            console.error = consoleBackup.error
 
-        console.log = consoleBackup.log
-        console.warn = consoleBackup.warn
-        console.error = consoleBackup.error
-
-        return output
-    }
-
-    function onRunTriggered(editor) {
-        setOutput(runCode(editor.getValue()))
+            setOutput(newOutput)
+        }
     }
 
     return (
         <div id="algorithm">
             <div id="algorithm_name"><h1>{algorithmName}</h1></div>
             <div id="code-editor">
-            <AceEditor
-                placeholder="Placeholder Text"
-                mode="javascript"
-                theme="monokai"
-                width="100%"
-                height="100%"
-                fontSize="1rem"
-                showPrintMargin={true}
-                showGutter={true}
-                highlightActiveLine={true}
-                commands={[{
-                    name:"run",
-                    bindKey: {win: "Ctrl-Return", mac:"Cmd-Return"},
-                    exec: onRunTriggered
-                }]}
-                setOptions={{
-                    enableBasicAutocompletion: true,
-                    enableLiveAutocompletion: true,
-                    enableSnippets: false,
-                    showLineNumbers: true,
-                    tabSize: 4,
-            }}/>
+                <CodeEditorComponent onRunCode={onRunCode}></CodeEditorComponent>
             </div>
             <div id="graph-visualisation"></div>
             <div id="code-output">{output.map((el, index) => <p key={index}>{el}</p>)}</div>
