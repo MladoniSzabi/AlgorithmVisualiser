@@ -25,10 +25,13 @@ function AlgorithmPage() {
         console.log = (message, ...other) => {
 
             newOutput.push(JSON.stringify(message))
-            other.forEach((el) => {newOutput.push(JSON.stringify(el))})
+            other.forEach((el) => { newOutput.push(JSON.stringify(el)) })
         }
         console.warn = console.log
         console.error = console.log
+
+        // Wrap user code in a function so we can pass in the graph
+        code = "(graph) => {" + code + "}"
 
         // Run code in editor
         //
@@ -41,8 +44,9 @@ function AlgorithmPage() {
         // Leaking information should not be a problem since we are not storing any
         // sensitive data.
         try {
-            eval(code)
-        } catch(error) {
+            let func = eval(code)
+            func(graph)
+        } catch (error) {
             newOutput.push(error.toString())
         } finally {
             // Restore console object so it works as expected
