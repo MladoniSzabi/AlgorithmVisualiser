@@ -1,14 +1,27 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom"
 
 import './AlgorithmPage.css'
 import GraphComponent from "component/GraphComponent";
 import CodeEditorComponent from "component/CodeEditorComponent";
+import graphFactory from "lib/graphFactory";
 
 function AlgorithmPage() {
 
     const { algorithmName } = useParams()
     let [output, setOutput] = useState([])
+    let [graph, setGraph] = useState(null)
+
+    useEffect(() => {
+        async function fetchGraph() {
+            const graph = await graphFactory(algorithmName)
+            setGraph(graph)
+        }
+
+        if(!graph) {
+            fetchGraph()
+        }
+    })
 
     function onRunCode(code) {
         let newOutput = output.slice()
@@ -65,7 +78,7 @@ function AlgorithmPage() {
                 <CodeEditorComponent onRunCode={onRunCode}></CodeEditorComponent>
             </div>
             <div id="graph-visualisation">
-                <GraphComponent></GraphComponent>
+                {graph && <GraphComponent graph={graph}></GraphComponent>}
             </div>
             <div id="code-output">{output.map((el, index) => <p key={index}>{el}</p>)}</div>
         </div>
