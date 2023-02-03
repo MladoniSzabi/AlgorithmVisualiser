@@ -1,0 +1,92 @@
+{
+    "options": {
+        "type": "mixed",
+        "multi": false,
+        "allowSelfLoops": true
+    },
+    "attributes": {},
+    "nodes": [
+        {
+            "key": "0",
+            "attributes": {
+                "x": 0.1,
+                "y": 0.1,
+                "color": "#000"
+            }
+        },
+        {
+            "key": "1",
+            "attributes": {
+                "x": 0.9,
+                "y": 0.1,
+                "color": "#000"
+            }
+        },
+        {
+            "key": "2",
+            "attributes": {
+                "x": 0.1,
+                "y": 0.9,
+                "color": "#000"
+            }
+        },
+        {
+            "key": "3",
+            "attributes": {
+                "x": 0.9,
+                "y": 0.9,
+                "color": "#000"
+            }
+        }
+    ],
+    "edges": [
+        {
+            "key": "geid_56_0",
+            "source": "0",
+            "target": "1",
+            "attributes": {
+                "value": 20
+            }
+        },
+        {
+            "key": "geid_56_1",
+            "source": "1",
+            "target": "2",
+            "attributes": {
+                "value": 34
+            }
+        },
+        {
+            "key": "geid_56_2",
+            "source": "2",
+            "target": "3",
+            "attributes": {
+                "value": 12
+            }
+        },
+        {
+            "key": "geid_56_3",
+            "source": "3",
+            "target": "0",
+            "attributes": {
+                "value": 42
+            }
+        },
+        {
+            "key": "geid_56_4",
+            "source": "0",
+            "target": "2",
+            "attributes": {
+                "value": 35
+            }
+        },
+        {
+            "key": "geid_56_5",
+            "source": "1",
+            "target": "3",
+            "attributes": {
+                "value": 30
+            }
+        }
+    ]
+}
