@@ -13,18 +13,8 @@ class EventRegistration {
         this.newNodeIndex = sigma.getGraph().order
 
         registerEvents({
-            clickStage: this.clickStage.bind(this),
             mousedown: this.mousedown.bind(this)
         })
-    }
-
-    clickStage(event) {
-        const pos = this.sigma.viewportToGraph(event.event);
-        console.log(pos)
-        this.sigma.getGraph().addNode(this.newNodeIndex++, {x: pos.x, y: pos.y, color: "#000"})
-        event.event.preventSigmaDefault();
-        event.event.original.preventDefault();
-        event.event.original.stopPropagation();
     }
 
     mousedown() {
