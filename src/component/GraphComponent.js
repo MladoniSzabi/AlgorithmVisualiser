@@ -11,10 +11,37 @@ class EventRegistration {
     constructor(sigma, registerEvents) {
         this.sigma = sigma
         this.newNodeIndex = sigma.getGraph().order
+        this.selectedNode = null
 
         registerEvents({
+            clickNode: this.clickNode.bind(this),
             mousedown: this.mousedown.bind(this)
         })
+
+    }
+
+    clickNode(event) {
+        if (this.selectedNode) {
+            let size = this.sigma.getGraph().getNodeAttribute(this.selectedNode, "size")
+            this.sigma.getGraph().setNodeAttribute(this.selectedNode, "size", size / 1.5)
+        }
+
+        if (this.selectedNode === event.node) {
+            this.selectedNode = null
+            event.event.preventSigmaDefault();
+            event.event.original.preventDefault();
+            event.event.original.stopPropagation();
+            return
+        }
+
+        this.selectedNode = event.node
+        let size = this.sigma.getGraph().getNodeAttribute(this.selectedNode, "size")
+        this.sigma.getGraph().setNodeAttribute(this.selectedNode, "size", size * 1.5)
+
+        event.event.preventSigmaDefault();
+        event.event.original.preventDefault();
+        event.event.original.stopPropagation();
+
     }
 
     mousedown() {
