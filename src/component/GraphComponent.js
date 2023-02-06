@@ -44,23 +44,39 @@ class EventRegistration {
 
     }
 
+    keypress(event) {
+        console.log(event)
+    }
+
     mousedown() {
         if (!this.sigma.getCustomBBox()) this.sigma.setCustomBBox(this.sigma.getBBox());
     }
 }
 
+// Have to store this since the useEffect callback gets called 4 times
+// This way we can stop having 4 keypress event listeners on the sigma container
+let keyDownCallback = null
+
 function GraphComponent({ graph }) {
 
-    function InitGraph () {
+    function InitGraph() {
         const loadGraph = useLoadGraph();
         const registerEvents = useRegisterEvents();
         const sigma = useSigma()
-      
-        useEffect(() => {loadGraphEffect(graph, loadGraph)}, [loadGraph]);
-        useEffect(() => {new EventRegistration(sigma, registerEvents)}, [registerEvents, sigma]);
-      
+
+        useEffect(() => { loadGraphEffect(graph, loadGraph) }, [loadGraph]);
+        useEffect(() => {
+            const eventRegistrationObject = new EventRegistration(sigma, registerEvents)
+            sigma.getContainer().tabIndex = "0"
+            console.log(keyDownCallback)
+            sigma.getContainer().removeEventListener("keypress", keyDownCallback)
+            keyDownCallback = eventRegistrationObject.keypress.bind(eventRegistrationObject)
+            sigma.getContainer().addEventListener("keypress", keyDownCallback)
+
+        }, [registerEvents, sigma]);
+
         return null;
-      };
+    };
 
     return (
         <SigmaContainer settings={{ drawEdges: true, clone: false }}>
