@@ -74,7 +74,7 @@ class EventRegistration {
         this.hoveredNode = null
     }
 
-    keypress(event) {
+    keydown(event) {
         if (event.key == 'a') {
             const pos = this.sigma.viewportToGraph({ x: this.mouseX, y: this.mouseY })
             const node = this.sigma.getGraph().addNode(this.newNodeIndex++, { x: pos.x, y: pos.y, color: "#000", size: this.defaultSize })
@@ -113,9 +113,9 @@ function GraphComponent({ graph }) {
         useEffect(() => {
             const eventRegistrationObject = new EventRegistration(sigma, registerEvents)
             sigma.getContainer().tabIndex = "0"
-            sigma.getContainer().removeEventListener("keypress", keyDownCallback)
-            keyDownCallback = eventRegistrationObject.keypress.bind(eventRegistrationObject)
-            sigma.getContainer().addEventListener("keypress", keyDownCallback)
+            sigma.getContainer().removeEventListener("keydown", keyDownCallback)
+            keyDownCallback = eventRegistrationObject.keydown.bind(eventRegistrationObject)
+            sigma.getContainer().addEventListener("keydown", keyDownCallback)
 
         }, [registerEvents, sigma]);
 
