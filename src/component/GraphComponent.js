@@ -14,6 +14,8 @@ class EventRegistration {
         this.selectedNode = null
         this.mouseX = 0
         this.mouseY = 0
+        // TODO: Don't hardcode this
+        this.defaultSize = 4
 
         registerEvents({
             clickNode: this.clickNode.bind(this),
@@ -62,7 +64,11 @@ class EventRegistration {
     }
 
     keypress(event) {
-        console.log(event)
+        if(event.key == 'a') {
+            const pos = this.sigma.viewportToGraph({x: this.mouseX, y: this.mouseY})
+            const node = this.sigma.getGraph().addNode(this.newNodeIndex++, {x: pos.x, y: pos.y, color: "#000", size: this.defaultSize})
+            this.selectNode(node)
+        }
     }
 
     mousedown() {
