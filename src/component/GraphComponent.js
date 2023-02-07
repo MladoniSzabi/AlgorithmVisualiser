@@ -12,6 +12,7 @@ class EventRegistration {
         this.sigma = sigma
         this.newNodeIndex = sigma.getGraph().order
         this.selectedNode = null
+        this.hoveredNode = null
         this.mouseX = 0
         this.mouseY = 0
         // TODO: Don't hardcode this
@@ -21,6 +22,8 @@ class EventRegistration {
             clickNode: this.clickNode.bind(this),
             mousedown: this.mousedown.bind(this),
             mousemove: this.mousemove.bind(this),
+            enterNode: this.enterNode.bind(this),
+            leaveNode: this.leaveNode.bind(this),
         })
 
     }
@@ -63,10 +66,18 @@ class EventRegistration {
         this.preventDefault(event)
     }
 
+    enterNode(event) {
+        this.hoveredNode = event.node
+    }
+
+    leaveNode() {
+        this.hoveredNode = null
+    }
+
     keypress(event) {
-        if(event.key == 'a') {
-            const pos = this.sigma.viewportToGraph({x: this.mouseX, y: this.mouseY})
-            const node = this.sigma.getGraph().addNode(this.newNodeIndex++, {x: pos.x, y: pos.y, color: "#000", size: this.defaultSize})
+        if (event.key == 'a') {
+            const pos = this.sigma.viewportToGraph({ x: this.mouseX, y: this.mouseY })
+            const node = this.sigma.getGraph().addNode(this.newNodeIndex++, { x: pos.x, y: pos.y, color: "#000", size: this.defaultSize })
             this.selectNode(node)
         }
     }
