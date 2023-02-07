@@ -79,6 +79,12 @@ class EventRegistration {
             const pos = this.sigma.viewportToGraph({ x: this.mouseX, y: this.mouseY })
             const node = this.sigma.getGraph().addNode(this.newNodeIndex++, { x: pos.x, y: pos.y, color: "#000", size: this.defaultSize })
             this.selectNode(node)
+        } else if (event.key == 'e') {
+            if (!this.selectNode || !this.hoveredNode) {
+                return
+            }
+
+            this.sigma.getGraph().addEdge(this.selectedNode, this.hoveredNode)
         }
     }
 
