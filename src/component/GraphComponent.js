@@ -7,6 +7,9 @@ function loadGraphEffect(graph, loadGraph) {
     loadGraph(graph)
 }
 
+const NODE_MOVE_AMOUNT = 0.01
+const NODE_MOVE_AMOUNT_SMALL = 0.001
+
 class EventRegistration {
     constructor(sigma, registerEvents) {
         this.sigma = sigma
@@ -85,6 +88,34 @@ class EventRegistration {
             }
 
             this.sigma.getGraph().addEdge(this.selectedNode, this.hoveredNode)
+        } else if (event.key == "ArrowLeft") {
+            if (!this.selectedNode)
+                return
+
+            const moveAmmount = event.shiftKey ? NODE_MOVE_AMOUNT_SMALL : NODE_MOVE_AMOUNT
+            const x = this.sigma.getGraph().getNodeAttribute(this.selectedNode, "x")
+            this.sigma.getGraph().setNodeAttribute(this.selectedNode, "x", x - moveAmmount)
+        } else if (event.key == "ArrowRight") {
+            if (!this.selectedNode)
+                return
+
+            const moveAmmount = event.shiftKey ? NODE_MOVE_AMOUNT_SMALL : NODE_MOVE_AMOUNT
+            const x = this.sigma.getGraph().getNodeAttribute(this.selectedNode, "x")
+            this.sigma.getGraph().setNodeAttribute(this.selectedNode, "x", x + moveAmmount)
+        } else if (event.key == "ArrowUp") {
+            if (!this.selectedNode)
+                return
+
+            const moveAmmount = event.shiftKey ? NODE_MOVE_AMOUNT_SMALL : NODE_MOVE_AMOUNT
+            const y = this.sigma.getGraph().getNodeAttribute(this.selectedNode, "y")
+            this.sigma.getGraph().setNodeAttribute(this.selectedNode, "y", y + moveAmmount)
+        } else if (event.key == "ArrowDown") {
+            if (!this.selectedNode)
+                return
+
+            const moveAmmount = event.shiftKey ? NODE_MOVE_AMOUNT_SMALL : NODE_MOVE_AMOUNT
+            const y = this.sigma.getGraph().getNodeAttribute(this.selectedNode, "y")
+            this.sigma.getGraph().setNodeAttribute(this.selectedNode, "y", y - moveAmmount)
         }
     }
 
