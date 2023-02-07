@@ -15,33 +15,47 @@ class EventRegistration {
 
         registerEvents({
             clickNode: this.clickNode.bind(this),
-            mousedown: this.mousedown.bind(this)
+            mousedown: this.mousedown.bind(this),
         })
 
     }
 
-    clickNode(event) {
-        if (this.selectedNode) {
-            let size = this.sigma.getGraph().getNodeAttribute(this.selectedNode, "size")
-            this.sigma.getGraph().setNodeAttribute(this.selectedNode, "size", size / 1.5)
-        }
-
-        if (this.selectedNode === event.node) {
-            this.selectedNode = null
-            event.event.preventSigmaDefault();
-            event.event.original.preventDefault();
-            event.event.original.stopPropagation();
-            return
-        }
-
-        this.selectedNode = event.node
+    selectNode(node) {
+        this.unselectNode()
+        this.selectedNode = node
         let size = this.sigma.getGraph().getNodeAttribute(this.selectedNode, "size")
         this.sigma.getGraph().setNodeAttribute(this.selectedNode, "size", size * 1.5)
 
+        return node
+    }
+
+    unselectNode() {
+        let selectedNode = this.selectedNode
+        if (selectedNode) {
+            let size = this.sigma.getGraph().getNodeAttribute(this.selectedNode, "size")
+            this.sigma.getGraph().setNodeAttribute(this.selectedNode, "size", size / 1.5)
+            this.selectedNode = null
+        }
+
+        return selectedNode
+    }
+
+    preventDefault(event) {
         event.event.preventSigmaDefault();
         event.event.original.preventDefault();
         event.event.original.stopPropagation();
+    }
 
+    clickNode(event) {
+
+        if (this.selectedNode === event.node) {
+            this.unselectNode()
+            this.preventDefault(event)
+            return
+        }
+
+        this.selectNode(event.node)
+        this.preventDefault(event)
     }
 
     keypress(event) {
@@ -68,7 +82,6 @@ function GraphComponent({ graph }) {
         useEffect(() => {
             const eventRegistrationObject = new EventRegistration(sigma, registerEvents)
             sigma.getContainer().tabIndex = "0"
-            console.log(keyDownCallback)
             sigma.getContainer().removeEventListener("keypress", keyDownCallback)
             keyDownCallback = eventRegistrationObject.keypress.bind(eventRegistrationObject)
             sigma.getContainer().addEventListener("keypress", keyDownCallback)
