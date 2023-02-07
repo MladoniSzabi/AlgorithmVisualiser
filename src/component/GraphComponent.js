@@ -12,10 +12,13 @@ class EventRegistration {
         this.sigma = sigma
         this.newNodeIndex = sigma.getGraph().order
         this.selectedNode = null
+        this.mouseX = 0
+        this.mouseY = 0
 
         registerEvents({
             clickNode: this.clickNode.bind(this),
             mousedown: this.mousedown.bind(this),
+            mousemove: this.mousemove.bind(this),
         })
 
     }
@@ -64,6 +67,11 @@ class EventRegistration {
 
     mousedown() {
         if (!this.sigma.getCustomBBox()) this.sigma.setCustomBBox(this.sigma.getBBox());
+    }
+
+    mousemove(event) {
+        this.mouseX = event.x
+        this.mouseY = event.y
     }
 }
 
