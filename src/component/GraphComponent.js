@@ -15,7 +15,7 @@ const NODE_MOVE_AMOUNT_SMALL = 0.001
 // This way we can stop having 4 keypress event listeners on the sigma container
 let keyDownCallback = null
 
-class EventRegistration extends Component {
+class GraphController extends Component {
     constructor({ sigma, registerEvents }) {
         super()
         this.state = {
@@ -173,7 +173,7 @@ function GraphComponent({ graph }) {
 
         useEffect(() => { loadGraphEffect(graph, loadGraph) }, [loadGraph]);
 
-        return <EventRegistration sigma={sigma} registerEvents={registerEvents}></EventRegistration>;
+        return <GraphController sigma={sigma} registerEvents={registerEvents}></GraphController>;
     };
 
     return (
