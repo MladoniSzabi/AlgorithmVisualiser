@@ -1,5 +1,5 @@
-import { useEffect, Component } from "react";
-import { SigmaContainer, useLoadGraph, useRegisterEvents, useSigma } from "@react-sigma/core";
+import { Component, useEffect } from "react";
+import { SigmaContainer, useLoadGraph, useRegisterEvents, useSigma, ControlsContainer } from "@react-sigma/core";
 
 import "@react-sigma/core/lib/react-sigma.min.css";
 
@@ -17,7 +17,9 @@ let keyDownCallback = null
 class EventRegistration extends Component {
     constructor({ sigma, registerEvents }) {
         super()
-        this.selectedNode = null
+        this.state = {
+            selectedNode: null
+        }
         this.sigma = sigma
         this.hoveredNode = null
         this.mouseX = 0
@@ -25,19 +27,20 @@ class EventRegistration extends Component {
         // TODO: Don't hardcode this
         this.defaultSize = 4
         this.keydown = this.keydown.bind(this)
+        this.registerEvents = registerEvents
         this.render = this.render.bind(this)
 
-        registerEvents({
+        this.registerEvents({
             clickNode: this.clickNode.bind(this),
             mousedown: this.mousedown.bind(this),
             mousemove: this.mousemove.bind(this),
             enterNode: this.enterNode.bind(this),
             leaveNode: this.leaveNode.bind(this),
         })
-
     }
 
     componentDidMount() {
+
         this.newNodeIndex = this.sigma.getGraph().order
 
         this.sigma.getContainer().tabIndex = "0"
@@ -48,19 +51,19 @@ class EventRegistration extends Component {
 
     selectNode(node) {
         this.unselectNode()
-        this.selectedNode = node
-        let size = this.sigma.getGraph().getNodeAttribute(this.selectedNode, "size")
-        this.sigma.getGraph().setNodeAttribute(this.selectedNode, "size", size * 1.5)
+        this.setState({ selectedNode: node })
+        let size = this.sigma.getGraph().getNodeAttribute(node, "size")
+        this.sigma.getGraph().setNodeAttribute(node, "size", size * 1.5)
 
         return node
     }
 
     unselectNode() {
-        let selectedNode = this.selectedNode
+        let selectedNode = this.state.selectedNode
         if (selectedNode) {
-            let size = this.sigma.getGraph().getNodeAttribute(this.selectedNode, "size")
-            this.sigma.getGraph().setNodeAttribute(this.selectedNode, "size", size / 1.5)
-            this.selectedNode = null
+            let size = this.sigma.getGraph().getNodeAttribute(this.state.selectedNode, "size")
+            this.sigma.getGraph().setNodeAttribute(this.state.selectedNode, "size", size / 1.5)
+            this.setState({ selectedNode: null })
         }
 
         return selectedNode
@@ -74,7 +77,7 @@ class EventRegistration extends Component {
 
     clickNode(event) {
 
-        if (this.selectedNode === event.node) {
+        if (this.state.selectedNode === event.node) {
             this.unselectNode()
             this.preventDefault(event)
             return
@@ -93,44 +96,44 @@ class EventRegistration extends Component {
     }
 
     keydown(event) {
-        if (event.key == 'a') {
+        if (event.key === 'a') {
             const pos = this.sigma.viewportToGraph({ x: this.mouseX, y: this.mouseY })
             const node = this.sigma.getGraph().addNode(this.newNodeIndex++, { x: pos.x, y: pos.y, color: "#000", size: this.defaultSize })
             this.selectNode(node)
-        } else if (event.key == 'e') {
+        } else if (event.key === 'e') {
             if (!this.selectNode || !this.hoveredNode) {
                 return
             }
 
-            this.sigma.getGraph().addEdge(this.selectedNode, this.hoveredNode)
-        } else if (event.key == "ArrowLeft") {
-            if (!this.selectedNode)
+            this.sigma.getGraph().addEdge(this.state.selectedNode, this.hoveredNode)
+        } else if (event.key === "ArrowLeft") {
+            if (!this.state.selectedNode)
                 return
 
             const moveAmmount = event.shiftKey ? NODE_MOVE_AMOUNT_SMALL : NODE_MOVE_AMOUNT
-            const x = this.sigma.getGraph().getNodeAttribute(this.selectedNode, "x")
-            this.sigma.getGraph().setNodeAttribute(this.selectedNode, "x", x - moveAmmount)
-        } else if (event.key == "ArrowRight") {
-            if (!this.selectedNode)
+            const x = this.sigma.getGraph().getNodeAttribute(this.state.selectedNode, "x")
+            this.sigma.getGraph().setNodeAttribute(this.state.selectedNode, "x", x - moveAmmount)
+        } else if (event.key === "ArrowRight") {
+            if (!this.state.selectedNode)
                 return
 
             const moveAmmount = event.shiftKey ? NODE_MOVE_AMOUNT_SMALL : NODE_MOVE_AMOUNT
-            const x = this.sigma.getGraph().getNodeAttribute(this.selectedNode, "x")
-            this.sigma.getGraph().setNodeAttribute(this.selectedNode, "x", x + moveAmmount)
-        } else if (event.key == "ArrowUp") {
-            if (!this.selectedNode)
+            const x = this.sigma.getGraph().getNodeAttribute(this.state.selectedNode, "x")
+            this.sigma.getGraph().setNodeAttribute(this.state.selectedNode, "x", x + moveAmmount)
+        } else if (event.key === "ArrowUp") {
+            if (!this.state.selectedNode)
                 return
 
             const moveAmmount = event.shiftKey ? NODE_MOVE_AMOUNT_SMALL : NODE_MOVE_AMOUNT
-            const y = this.sigma.getGraph().getNodeAttribute(this.selectedNode, "y")
-            this.sigma.getGraph().setNodeAttribute(this.selectedNode, "y", y + moveAmmount)
-        } else if (event.key == "ArrowDown") {
-            if (!this.selectedNode)
+            const y = this.sigma.getGraph().getNodeAttribute(this.state.selectedNode, "y")
+            this.sigma.getGraph().setNodeAttribute(this.state.selectedNode, "y", y + moveAmmount)
+        } else if (event.key === "ArrowDown") {
+            if (!this.state.selectedNode)
                 return
 
             const moveAmmount = event.shiftKey ? NODE_MOVE_AMOUNT_SMALL : NODE_MOVE_AMOUNT
-            const y = this.sigma.getGraph().getNodeAttribute(this.selectedNode, "y")
-            this.sigma.getGraph().setNodeAttribute(this.selectedNode, "y", y - moveAmmount)
+            const y = this.sigma.getGraph().getNodeAttribute(this.state.selectedNode, "y")
+            this.sigma.getGraph().setNodeAttribute(this.state.selectedNode, "y", y - moveAmmount)
         }
     }
 
