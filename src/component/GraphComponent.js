@@ -30,6 +30,7 @@ class GraphController extends Component {
         this.keydown = this.keydown.bind(this)
         this.render = this.render.bind(this)
         this.onAttributeChange = this.onAttributeChange.bind(this)
+        this.addNewAttribute = this.addNewAttribute.bind(this)
 
         registerEvents({
             clickNode: this.clickNode.bind(this),
@@ -152,6 +153,12 @@ class GraphController extends Component {
         this.forceUpdate()
     }
 
+    addNewAttribute() {
+        let newAttribute = prompt("Enter name of new attribute: ")
+        this.sigma.getGraph().setNodeAttribute(this.state.selectedNode, newAttribute, "")
+        this.forceUpdate()
+    }
+
     render() {
         if (!this.state.selectedNode) {
             return null
@@ -166,7 +173,7 @@ class GraphController extends Component {
                 </div>
             )}
 
-            <span className="material-symbols-outlined">add_circle</span>
+            <span onClick={this.addNewAttribute} className="material-symbols-outlined" id="add-attribute">add_circle</span>
         </ControlsContainer>
     }
 }
