@@ -2,6 +2,7 @@ import { Component, useEffect } from "react";
 import { SigmaContainer, useLoadGraph, useRegisterEvents, useSigma, ControlsContainer } from "@react-sigma/core";
 
 import "@react-sigma/core/lib/react-sigma.min.css";
+import './GraphComponent.css'
 
 function loadGraphEffect(graph, loadGraph) {
     loadGraph(graph)
@@ -147,7 +148,19 @@ class EventRegistration extends Component {
     }
 
     render() {
-        return null
+        if (!this.state.selectedNode) {
+            return null
+        }
+
+        const MANDATORY_ATTRIBUTES = ['size', 'color', 'x', 'y']
+        let attributes = this.sigma.getGraph().getNodeAttributes(this.state.selectedNode)
+        return <ControlsContainer id="node-controls" position={"bottom-right"}>
+            {Object.keys(attributes).map((key) =>
+                <div className="node-property" key={String(this.state.selectedNode) + ":" + String(key)}>
+                    <p>{key}: {attributes[key]}</p>
+                </div>
+            )}
+        </ControlsContainer>
     }
 }
 

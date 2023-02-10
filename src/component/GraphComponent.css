@@ -1,0 +1,9 @@
+#node-controls {
+    width: calc(100% - 3 * var(--sigma-controls-margin) - 1em);
+    padding: 0.5em;
+
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-around;
+}
