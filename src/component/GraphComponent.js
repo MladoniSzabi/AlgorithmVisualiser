@@ -108,6 +108,12 @@ class GraphController extends Component {
             }
 
             this.sigma.getGraph().addEdge(this.state.selectedNode, this.hoveredNode)
+        } else if (event.key === 'd') {
+            let confirmDelete = window.confirm("Are you sure you want to delete this node?")
+            if (confirmDelete) {
+                this.setState({ selectedNode: null })
+                this.sigma.getGraph().dropNode(this.state.selectedNode)
+            }
         } else if (event.key === "ArrowLeft") {
             if (!this.state.selectedNode)
                 return
