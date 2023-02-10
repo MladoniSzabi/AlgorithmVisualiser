@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, Component } from "react";
 import { SigmaContainer, useLoadGraph, useRegisterEvents, useSigma } from "@react-sigma/core";
 
 import "@react-sigma/core/lib/react-sigma.min.css";
@@ -10,16 +10,22 @@ function loadGraphEffect(graph, loadGraph) {
 const NODE_MOVE_AMOUNT = 0.01
 const NODE_MOVE_AMOUNT_SMALL = 0.001
 
-class EventRegistration {
-    constructor(sigma, registerEvents) {
-        this.sigma = sigma
-        this.newNodeIndex = sigma.getGraph().order
+// Have to store this since the useEffect callback gets called 4 times
+// This way we can stop having 4 keypress event listeners on the sigma container
+let keyDownCallback = null
+
+class EventRegistration extends Component {
+    constructor({ sigma, registerEvents }) {
+        super()
         this.selectedNode = null
+        this.sigma = sigma
         this.hoveredNode = null
         this.mouseX = 0
         this.mouseY = 0
         // TODO: Don't hardcode this
         this.defaultSize = 4
+        this.keydown = this.keydown.bind(this)
+        this.render = this.render.bind(this)
 
         registerEvents({
             clickNode: this.clickNode.bind(this),
@@ -29,6 +35,15 @@ class EventRegistration {
             leaveNode: this.leaveNode.bind(this),
         })
 
+    }
+
+    componentDidMount() {
+        this.newNodeIndex = this.sigma.getGraph().order
+
+        this.sigma.getContainer().tabIndex = "0"
+        this.sigma.getContainer().removeEventListener("keydown", keyDownCallback)
+        keyDownCallback = this.keydown
+        this.sigma.getContainer().addEventListener("keydown", this.keydown)
     }
 
     selectNode(node) {
@@ -127,11 +142,11 @@ class EventRegistration {
         this.mouseX = event.x
         this.mouseY = event.y
     }
-}
 
-// Have to store this since the useEffect callback gets called 4 times
-// This way we can stop having 4 keypress event listeners on the sigma container
-let keyDownCallback = null
+    render() {
+        return null
+    }
+}
 
 function GraphComponent({ graph }) {
 
@@ -141,16 +156,8 @@ function GraphComponent({ graph }) {
         const sigma = useSigma()
 
         useEffect(() => { loadGraphEffect(graph, loadGraph) }, [loadGraph]);
-        useEffect(() => {
-            const eventRegistrationObject = new EventRegistration(sigma, registerEvents)
-            sigma.getContainer().tabIndex = "0"
-            sigma.getContainer().removeEventListener("keydown", keyDownCallback)
-            keyDownCallback = eventRegistrationObject.keydown.bind(eventRegistrationObject)
-            sigma.getContainer().addEventListener("keydown", keyDownCallback)
 
-        }, [registerEvents, sigma]);
-
-        return null;
+        return <EventRegistration sigma={sigma} registerEvents={registerEvents}></EventRegistration>;
     };
 
     return (
