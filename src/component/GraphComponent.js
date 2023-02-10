@@ -28,10 +28,10 @@ class GraphController extends Component {
         // TODO: Don't hardcode this
         this.defaultSize = 4
         this.keydown = this.keydown.bind(this)
-        this.registerEvents = registerEvents
         this.render = this.render.bind(this)
+        this.onAttributeChange = this.onAttributeChange.bind(this)
 
-        this.registerEvents({
+        registerEvents({
             clickNode: this.clickNode.bind(this),
             mousedown: this.mousedown.bind(this),
             mousemove: this.mousemove.bind(this),
@@ -147,6 +147,11 @@ class GraphController extends Component {
         this.mouseY = event.y
     }
 
+    onAttributeChange(key, event) {
+        this.sigma.getGraph().setNodeAttribute(this.state.selectedNode, key, event.target.value)
+        this.forceUpdate()
+    }
+
     render() {
         if (!this.state.selectedNode) {
             return null
@@ -157,9 +162,11 @@ class GraphController extends Component {
         return <ControlsContainer id="node-controls" position={"bottom-right"}>
             {Object.keys(attributes).map((key) =>
                 <div className="node-property" key={String(this.state.selectedNode) + ":" + String(key)}>
-                    <p>{key}: {attributes[key]}</p>
+                    <p>{key}: <input onChange={(event) => this.onAttributeChange(key, event)} value={attributes[key]} /></p>
                 </div>
             )}
+
+            <span className="material-symbols-outlined">add_circle</span>
         </ControlsContainer>
     }
 }
