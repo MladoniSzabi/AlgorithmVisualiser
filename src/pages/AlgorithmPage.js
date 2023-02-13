@@ -11,6 +11,7 @@ function AlgorithmPage() {
     const { algorithmName } = useParams()
     const [output, setOutput] = useState([])
     const [graph, _setGraph] = useState(null)
+    const [code, setCode] = useState("")
     const graphRef = useRef(graph)
 
     function setGraph(newGraph) {
@@ -21,7 +22,8 @@ function AlgorithmPage() {
     useEffect(() => {
 
         async function fetchGraph() {
-            const graph = await graphFactory(algorithmName)
+            const [graph, code] = await graphFactory(algorithmName)
+            setCode(code)
             setGraph(graph)
         }
 
@@ -83,7 +85,7 @@ function AlgorithmPage() {
         <div id="algorithm">
             <div id="algorithm_name"><h1>{algorithmName}</h1></div>
             <div id="code-editor">
-                <CodeEditorComponent onRunCode={onRunCode}></CodeEditorComponent>
+                <CodeEditorComponent savedCode={code} onRunCode={onRunCode}></CodeEditorComponent>
             </div>
             <div id="graph-visualisation">
                 {graph && <GraphComponent graph={graph}></GraphComponent>}

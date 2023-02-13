@@ -11,9 +11,8 @@ export default async function graphFactory(graphName) {
     if (graphName in graphs) {
         const graph = new Graph()
         const graphContent = await (await fetch(graphs[graphName])).json()
-        console.log(graphContent)
         graph.import(graphContent)
-        return graph
+        return [graph, graphContent.code]
     }
 
     // It is a custom built graph
