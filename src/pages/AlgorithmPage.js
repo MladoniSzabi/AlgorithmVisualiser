@@ -1,39 +1,53 @@
-import React, { useEffect, useState, useRef } from "react";
-import { useParams } from "react-router-dom"
+import React, { Component } from "react";
+import { useLocation, useNavigate, useParams } from "react-router-dom"
 
 import './AlgorithmPage.css'
 import GraphComponent from "component/GraphComponent";
 import CodeEditorComponent from "component/CodeEditorComponent";
 import graphFactory from "lib/graphFactory";
 
-function AlgorithmPage() {
-
-    const { algorithmName } = useParams()
-    const [output, setOutput] = useState([])
-    const [graph, _setGraph] = useState(null)
-    const [code, setCode] = useState("")
-    const graphRef = useRef(graph)
-
-    function setGraph(newGraph) {
-        graphRef.current = newGraph
-        _setGraph(newGraph)
+function withRouter(Component) {
+    function ComponentWithRouterProp(props) {
+        let location = useLocation();
+        let navigate = useNavigate();
+        let params = useParams();
+        return (
+            <Component
+                {...props}
+                router={{ location, navigate, params }}
+            />
+        );
     }
 
-    useEffect(() => {
+    return ComponentWithRouterProp;
+}
 
-        async function fetchGraph() {
-            const [graph, code] = await graphFactory(algorithmName)
-            setCode(code)
-            setGraph(graph)
+class AlgorithmPage extends Component {
+    constructor() {
+        super()
+        this.state = {
+            output: [],
+            graph: null,
+            code: ""
         }
 
-        if (!graph) {
-            fetchGraph()
-        }
-    })
+        this.onRunCode = this.onRunCode.bind(this)
+        this.fetchGraph = this.fetchGraph.bind(this)
+        this.setGraph = this.setGraph.bind(this)
+    }
 
-    function onRunCode(code) {
-        let newOutput = output.slice()
+    componentDidMount() {
+        console.log("Mounted")
+        this.fetchGraph()
+    }
+
+    async fetchGraph() {
+        const [graph, code] = await graphFactory(this.props.router.params.algorithmName)
+        this.setState({ code, graph })
+    }
+
+    onRunCode(code) {
+        let newOutput = this.state.output.slice()
 
         // Back up console object so that we can restore it later
         let consoleBackup = {
@@ -45,9 +59,9 @@ function AlgorithmPage() {
         // Overwrite console object so that we can store its output and render it in
         // the output tab
         console.log = (message, ...other) => {
-
             newOutput.push(JSON.stringify(message))
             other.forEach((el) => { newOutput.push(JSON.stringify(el)) })
+            this.setState({ output: newOutput })
         }
         console.warn = console.log
         console.error = console.log
@@ -68,7 +82,7 @@ function AlgorithmPage() {
         try {
             // eslint-disable-next-line
             let func = eval(code)
-            func(graphRef.current)
+            func(this.state.graph)
         } catch (error) {
             newOutput.push(error.toString())
         } finally {
@@ -77,22 +91,28 @@ function AlgorithmPage() {
             console.warn = consoleBackup.warn
             console.error = consoleBackup.error
 
-            setOutput(newOutput)
+            this.setState({ output: newOutput })
         }
     }
 
-    return (
-        <div id="algorithm">
-            <div id="algorithm_name"><h1>{algorithmName}</h1></div>
-            <div id="code-editor">
-                <CodeEditorComponent savedCode={code} onRunCode={onRunCode}></CodeEditorComponent>
+    setGraph(newGraph) {
+        this.setState({ graph: newGraph })
+    }
+
+    render() {
+        return (
+            <div id="algorithm">
+                <div id="algorithm_name"><h1>{this.props.router.params.algorithmName}</h1></div>
+                <div id="code-editor">
+                    <CodeEditorComponent savedCode={this.state.code} onRunCode={this.onRunCode}></CodeEditorComponent>
+                </div>
+                <div id="graph-visualisation">
+                    {this.state.graph && <GraphComponent setGraph={this.setGraph} graph={this.state.graph}></GraphComponent>}
+                </div>
+                <div id="code-output">{this.state.output.map((el, index) => <p key={index}>{el}</p>)}</div>
             </div>
-            <div id="graph-visualisation">
-                {graph && <GraphComponent graph={graph}></GraphComponent>}
-            </div>
-            <div id="code-output">{output.map((el, index) => <p key={index}>{el}</p>)}</div>
-        </div>
-    )
+        )
+    }
 }
 
-export default AlgorithmPage
+export default withRouter(AlgorithmPage)

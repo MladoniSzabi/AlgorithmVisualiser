@@ -1,12 +1,8 @@
-import { Component, useEffect } from "react";
-import { SigmaContainer, useLoadGraph, useRegisterEvents, useSigma, ControlsContainer } from "@react-sigma/core";
+import { Component, createRef } from "react";
+import { SigmaContainer, ControlsContainer } from "@react-sigma/core";
 
 import "@react-sigma/core/lib/react-sigma.min.css";
 import './GraphComponent.css'
-
-function loadGraphEffect(graph, loadGraph) {
-    loadGraph(graph)
-}
 
 const NODE_MOVE_AMOUNT = 0.01
 const NODE_MOVE_AMOUNT_SMALL = 0.001
@@ -16,46 +12,70 @@ const NODE_MOVE_AMOUNT_SMALL = 0.001
 let keyDownCallback = null
 
 class GraphController extends Component {
-    constructor({ sigma, registerEvents }) {
+    constructor({ setGraph }) {
         super()
         this.state = {
             selectedNode: null
         }
-        this.sigma = sigma
+        this.sigma = createRef(null)
         this.hoveredNode = null
         this.mouseX = 0
         this.mouseY = 0
+        this.setParentGraph = setGraph
         // TODO: Don't hardcode this
         this.defaultSize = 4
         this.keydown = this.keydown.bind(this)
         this.render = this.render.bind(this)
         this.onAttributeChange = this.onAttributeChange.bind(this)
         this.addNewAttribute = this.addNewAttribute.bind(this)
+        this.setGraph = this.setGraph.bind(this)
+    }
 
-        registerEvents({
-            clickNode: this.clickNode.bind(this),
-            mousedown: this.mousedown.bind(this),
-            mousemove: this.mousemove.bind(this),
-            enterNode: this.enterNode.bind(this),
-            leaveNode: this.leaveNode.bind(this),
-        })
+    setGraph(graph) {
+        if (this.selectedNode) {
+            let size = this.sigma.current.getGraph().getNodeAttribute(this.state.selectedNode, "size")
+            this.sigma.current.getGraph().setNodeAttribute(this.selectedNode, "size", size / 1.5)
+        }
+
+        this.setParentGraph(graph)
+
+        if (this.selectedNode) {
+            let size = this.sigma.current.getGraph().getNodeAttribute(this.state.selectedNode, "size")
+            this.sigma.current.getGraph().setNodeAttribute(this.selectedNode, "size", size * 1.5)
+        }
     }
 
     componentDidMount() {
+        console.log("sigma", this.sigma.current)
+    }
 
-        this.newNodeIndex = this.sigma.getGraph().order
+    componentDidUpdate() {
+        this.newNodeIndex = this.props.graph.order
 
-        this.sigma.getContainer().tabIndex = "0"
-        this.sigma.getContainer().removeEventListener("keydown", keyDownCallback)
-        keyDownCallback = this.keydown
-        this.sigma.getContainer().addEventListener("keydown", this.keydown)
+        if (this.sigma.current) {
+            this.sigma.current.setGraph(this.props.graph)
+            this.sigma.current.removeAllListeners()
+
+            console.log(this.sigma.current._eventsCount)
+            this.sigma.current.on("clickNode", this.clickNode.bind(this))
+            this.sigma.current.getMouseCaptor().on("mousedown", this.mousedown.bind(this))
+            this.sigma.current.getMouseCaptor().on("mousemove", this.mousemove.bind(this))
+            this.sigma.current.on("enterNode", this.enterNode.bind(this))
+            this.sigma.current.on("leaveNode", this.leaveNode.bind(this))
+            console.log(this.sigma.current._eventsCount)
+
+            this.sigma.current.getContainer().tabIndex = "0"
+            this.sigma.current.getContainer().removeEventListener("keydown", keyDownCallback)
+            keyDownCallback = this.keydown
+            this.sigma.current.getContainer().addEventListener("keydown", this.keydown)
+        }
     }
 
     selectNode(node) {
         this.unselectNode()
         this.setState({ selectedNode: node })
-        let size = this.sigma.getGraph().getNodeAttribute(node, "size")
-        this.sigma.getGraph().setNodeAttribute(node, "size", size * 1.5)
+        let size = this.sigma.current.getGraph().getNodeAttribute(node, "size")
+        this.sigma.current.getGraph().setNodeAttribute(node, "size", size * 1.5)
 
         return node
     }
@@ -63,8 +83,8 @@ class GraphController extends Component {
     unselectNode() {
         let selectedNode = this.state.selectedNode
         if (selectedNode) {
-            let size = this.sigma.getGraph().getNodeAttribute(this.state.selectedNode, "size")
-            this.sigma.getGraph().setNodeAttribute(this.state.selectedNode, "size", size / 1.5)
+            let size = this.sigma.current.getGraph().getNodeAttribute(this.state.selectedNode, "size")
+            this.sigma.current.getGraph().setNodeAttribute(this.state.selectedNode, "size", size / 1.5)
             this.setState({ selectedNode: null })
         }
 
@@ -78,7 +98,7 @@ class GraphController extends Component {
     }
 
     clickNode(event) {
-
+        console.log("jksahdkjhsjkfd")
         if (this.state.selectedNode === event.node) {
             this.unselectNode()
             this.preventDefault(event)
@@ -99,54 +119,61 @@ class GraphController extends Component {
 
     keydown(event) {
         if (event.key === 'a') {
-            const pos = this.sigma.viewportToGraph({ x: this.mouseX, y: this.mouseY })
-            const node = this.sigma.getGraph().addNode(this.newNodeIndex++, { x: pos.x, y: pos.y, color: "#000", size: this.defaultSize })
+            const pos = this.sigma.current.viewportToGraph({ x: this.mouseX, y: this.mouseY })
+            const node = this.sigma.current.getGraph().addNode(this.newNodeIndex++, { x: pos.x, y: pos.y, color: "#000", size: this.defaultSize })
+            this.setGraph(this.sigma.current.getGraph())
             this.selectNode(node)
         } else if (event.key === 'e') {
             if (!this.selectNode || !this.hoveredNode) {
                 return
             }
 
-            this.sigma.getGraph().addEdge(this.state.selectedNode, this.hoveredNode)
+            this.sigma.current.getGraph().addEdge(this.state.selectedNode, this.hoveredNode)
+            this.setGraph(this.sigma.current.getGraph())
         } else if (event.key === 'd') {
             let confirmDelete = window.confirm("Are you sure you want to delete this node?")
             if (confirmDelete) {
                 this.setState({ selectedNode: null })
-                this.sigma.getGraph().dropNode(this.state.selectedNode)
+                this.sigma.current.getGraph().dropNode(this.state.selectedNode)
+                this.setGraph(this.sigma.current.getGraph())
             }
         } else if (event.key === "ArrowLeft") {
             if (!this.state.selectedNode)
                 return
 
             const moveAmmount = event.shiftKey ? NODE_MOVE_AMOUNT_SMALL : NODE_MOVE_AMOUNT
-            const x = this.sigma.getGraph().getNodeAttribute(this.state.selectedNode, "x")
-            this.sigma.getGraph().setNodeAttribute(this.state.selectedNode, "x", x - moveAmmount)
+            const x = this.sigma.current.getGraph().getNodeAttribute(this.state.selectedNode, "x")
+            this.sigma.current.getGraph().setNodeAttribute(this.state.selectedNode, "x", x - moveAmmount)
+            this.setGraph(this.sigma.current.getGraph())
         } else if (event.key === "ArrowRight") {
             if (!this.state.selectedNode)
                 return
 
             const moveAmmount = event.shiftKey ? NODE_MOVE_AMOUNT_SMALL : NODE_MOVE_AMOUNT
-            const x = this.sigma.getGraph().getNodeAttribute(this.state.selectedNode, "x")
-            this.sigma.getGraph().setNodeAttribute(this.state.selectedNode, "x", x + moveAmmount)
+            const x = this.sigma.current.getGraph().getNodeAttribute(this.state.selectedNode, "x")
+            this.sigma.current.getGraph().setNodeAttribute(this.state.selectedNode, "x", x + moveAmmount)
+            this.setGraph(this.sigma.current.getGraph())
         } else if (event.key === "ArrowUp") {
             if (!this.state.selectedNode)
                 return
 
             const moveAmmount = event.shiftKey ? NODE_MOVE_AMOUNT_SMALL : NODE_MOVE_AMOUNT
-            const y = this.sigma.getGraph().getNodeAttribute(this.state.selectedNode, "y")
-            this.sigma.getGraph().setNodeAttribute(this.state.selectedNode, "y", y + moveAmmount)
+            const y = this.sigma.current.getGraph().getNodeAttribute(this.state.selectedNode, "y")
+            this.sigma.current.getGraph().setNodeAttribute(this.state.selectedNode, "y", y + moveAmmount)
+            this.setGraph(this.sigma.current.getGraph())
         } else if (event.key === "ArrowDown") {
             if (!this.state.selectedNode)
                 return
 
             const moveAmmount = event.shiftKey ? NODE_MOVE_AMOUNT_SMALL : NODE_MOVE_AMOUNT
-            const y = this.sigma.getGraph().getNodeAttribute(this.state.selectedNode, "y")
-            this.sigma.getGraph().setNodeAttribute(this.state.selectedNode, "y", y - moveAmmount)
+            const y = this.sigma.current.getGraph().getNodeAttribute(this.state.selectedNode, "y")
+            this.sigma.current.getGraph().setNodeAttribute(this.state.selectedNode, "y", y - moveAmmount)
+            this.setGraph(this.sigma.current.getGraph())
         }
     }
 
     mousedown() {
-        if (!this.sigma.getCustomBBox()) this.sigma.setCustomBBox(this.sigma.getBBox());
+        if (!this.sigma.current.getCustomBBox()) this.sigma.current.setCustomBBox(this.sigma.current.getBBox());
     }
 
     mousemove(event) {
@@ -155,69 +182,59 @@ class GraphController extends Component {
     }
 
     onAttributeChange(key, event) {
-        this.sigma.getGraph().setNodeAttribute(this.state.selectedNode, key, event.target.value)
+        this.sigma.current.getGraph().setNodeAttribute(this.state.selectedNode, key, event.target.value)
+        this.setGraph(this.sigma.current.getGraph())
         this.forceUpdate()
     }
 
     addNewAttribute() {
         let newAttribute = prompt("Enter name of new attribute: ")
-        this.sigma.getGraph().setNodeAttribute(this.state.selectedNode, newAttribute, "")
+        this.sigma.current.getGraph().setNodeAttribute(this.state.selectedNode, newAttribute, "")
+        this.setGraph(this.sigma.current.getGraph())
         this.forceUpdate()
     }
 
     render() {
-        if (!this.state.selectedNode) {
-            return null
+
+        let propertyControls = null
+        if (this.state.selectedNode) {
+            //const MANDATORY_ATTRIBUTES = ['size', 'color', 'x', 'y']
+            let attributes = this.sigma.current.getGraph().getNodeAttributes(this.state.selectedNode)
+
+            propertyControls = <ControlsContainer id="node-controls" position={"bottom-right"}>
+                {Object.keys(attributes).map((key) =>
+                    <div className="node-property" key={String(this.state.selectedNode) + ":" + String(key)}>
+                        <p>{key}: <input onChange={(event) => this.onAttributeChange(key, event)} value={attributes[key]} /></p>
+                    </div>
+                )}
+
+                <span onClick={this.addNewAttribute} className="material-symbols-outlined" id="add-attribute">add_circle</span>
+            </ControlsContainer>
         }
 
-        const MANDATORY_ATTRIBUTES = ['size', 'color', 'x', 'y']
-        let attributes = this.sigma.getGraph().getNodeAttributes(this.state.selectedNode)
-        return <ControlsContainer id="node-controls" position={"bottom-right"}>
-            {Object.keys(attributes).map((key) =>
-                <div className="node-property" key={String(this.state.selectedNode) + ":" + String(key)}>
-                    <p>{key}: <input onChange={(event) => this.onAttributeChange(key, event)} value={attributes[key]} /></p>
-                </div>
-            )}
-
-            <span onClick={this.addNewAttribute} className="material-symbols-outlined" id="add-attribute">add_circle</span>
-        </ControlsContainer>
+        return <SigmaContainer
+            ref={this.sigma}
+            settings={{
+                renderLabels: true,
+                renderEdgeLabels: true,
+                edgeLabelSize: "10",
+                edgeLabelColor: "#000",
+                enableEdgeClickEvents: true,
+                enableEdgeHoverEvents: true,
+                edgeReducer: (edge, data) =>
+                ({
+                    label: data.label,
+                    size: data.size,
+                    color: data.color,
+                    hidden: data.hidde,
+                    forceLabel: data.forceLabel || true,
+                    zIndex: data.zIndex,
+                    type: data.type,
+                })
+            }}>
+            {propertyControls}
+        </SigmaContainer>
     }
 }
 
-function GraphComponent({ graph }) {
-
-    function InitGraph() {
-        const loadGraph = useLoadGraph();
-        const registerEvents = useRegisterEvents();
-        const sigma = useSigma()
-
-        useEffect(() => { loadGraphEffect(graph, loadGraph) }, [loadGraph]);
-
-        return <GraphController sigma={sigma} registerEvents={registerEvents}></GraphController>;
-    };
-
-    return (
-        <SigmaContainer settings={{
-            renderLabels: true,
-            renderEdgeLabels: true,
-            edgeLabelSize: "10",
-            edgeLabelColor: "#000",
-            enableEdgeClickEvents: true,
-            enableEdgeHoverEvents: true,
-            edgeReducer: (edge, data) =>
-            ({
-                label: data.label,
-                size: data.size,
-                color: data.color,
-                hidden: data.hidde,
-                forceLabel: data.forceLabel || true,
-                zIndex: data.zIndex,
-                type: data.type,
-            })
-        }}>
-            <InitGraph />
-        </SigmaContainer>
-    )
-}
-
-export default GraphComponent
+export default GraphController
