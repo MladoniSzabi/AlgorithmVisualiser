@@ -1,6 +1,6 @@
 import AceEditor from 'react-ace'
 import "ace-builds/src-noconflict/mode-javascript";
-import "ace-builds/src-noconflict/theme-monokai";
+import "ace-builds/src-noconflict/theme-tomorrow";
 import "ace-builds/src-noconflict/ext-language_tools";
 
 function CodeEditorComponent({ savedCode, onRunCode }) {
@@ -13,7 +13,7 @@ function CodeEditorComponent({ savedCode, onRunCode }) {
         placeholder="Enter your code here..."
         value={savedCode}
         mode="javascript"
-        theme="monokai"
+        theme="tomorrow"
         width="100%"
         height="100%"
         fontSize="1rem"

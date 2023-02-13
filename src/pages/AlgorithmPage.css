@@ -2,33 +2,36 @@
     display: grid;
     grid-template-columns: 1fr 1fr;
     grid-template-rows: auto 1fr 10rem;
-    grid-gap: 0.5rem;
-    grid-template-areas: 
+    grid-template-areas:
         'header header'
         'code graph'
         'output graph';
     width: 100vw;
-    height:100vh;
-    color: #a4a4a4;
-    background-color: #151515;
+    height: 100vh;
+    color: #4d4d4c
 }
 
 #algorithm_name {
     text-align: center;
     grid-area: header;
-    background-color: #2F3129;
+    color: #80a1bd;
+    border-bottom: 2px solid #555;
 }
 
 #code-editor {
     grid-area: code;
+    border-bottom: 2px solid #555;
 }
 
 #graph-visualisation {
     grid-area: graph;
+    border-left: 2px solid #555;
+    padding: 0.5em;
 }
 
 #code-output {
     grid-area: output;
+    padding: 0.5em;
 }
 
 #code-output p {
