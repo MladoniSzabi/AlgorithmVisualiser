@@ -44,5 +44,6 @@
     ]
   },
   "author": "Szabolcs Mladoniczky",
-  "license": "ISC"
+  "license": "ISC",
+  "homepage": "https://storage.googleapis.com/algs-website"
 }
