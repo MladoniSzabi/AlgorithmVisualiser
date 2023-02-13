@@ -197,7 +197,24 @@ function GraphComponent({ graph }) {
     };
 
     return (
-        <SigmaContainer settings={{ drawEdges: true, clone: false }}>
+        <SigmaContainer settings={{
+            renderLabels: true,
+            renderEdgeLabels: true,
+            edgeLabelSize: "10",
+            edgeLabelColor: "#000",
+            enableEdgeClickEvents: true,
+            enableEdgeHoverEvents: true,
+            edgeReducer: (edge, data) =>
+            ({
+                label: data.label,
+                size: data.size,
+                color: data.color,
+                hidden: data.hidde,
+                forceLabel: data.forceLabel || true,
+                zIndex: data.zIndex,
+                type: data.type,
+            })
+        }}>
             <InitGraph />
         </SigmaContainer>
     )
