@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import { useParams } from "react-router-dom"
 
 import './AlgorithmPage.css'
@@ -9,16 +9,23 @@ import graphFactory from "lib/graphFactory";
 function AlgorithmPage() {
 
     const { algorithmName } = useParams()
-    let [output, setOutput] = useState([])
-    let [graph, setGraph] = useState(null)
+    const [output, setOutput] = useState([])
+    const [graph, _setGraph] = useState(null)
+    const graphRef = useRef(graph)
+
+    function setGraph(newGraph) {
+        graphRef.current = newGraph
+        _setGraph(newGraph)
+    }
 
     useEffect(() => {
+
         async function fetchGraph() {
             const graph = await graphFactory(algorithmName)
             setGraph(graph)
         }
 
-        if(!graph) {
+        if (!graph) {
             fetchGraph()
         }
     })
@@ -57,8 +64,9 @@ function AlgorithmPage() {
         // Leaking information should not be a problem since we are not storing any
         // sensitive data.
         try {
+            // eslint-disable-next-line
             let func = eval(code)
-            func(graph)
+            func(graphRef.current)
         } catch (error) {
             newOutput.push(error.toString())
         } finally {
