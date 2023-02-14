@@ -50,14 +50,10 @@ class GraphComponent extends Component {
         }
     }
 
-    componentDidMount() {
-        console.log("sigma", this.sigma.current)
-    }
-
     componentDidUpdate() {
         this.newNodeIndex = this.props.graph.order
 
-        if (this.sigma.current) {
+        if (this.sigma.current && this.sigma.current._eventsCount === 0) {
             this.sigma.current.setGraph(this.props.graph)
             this.sigma.current.removeAllListeners()
 
@@ -100,7 +96,6 @@ class GraphComponent extends Component {
         this.hoveredEdge = event.edge
         let size = this.sigma.current.getGraph().getEdgeAttribute(this.hoveredEdge, "size") || EDGE_DEFAULT_SIZE
         this.sigma.current.getGraph().setEdgeAttribute(this.hoveredEdge, "size", size * 2)
-        console.log(size * 4)
     }
 
     leaveEdge(event) {
@@ -134,58 +129,66 @@ class GraphComponent extends Component {
         this.hoveredNode = null
     }
 
+    addNode(position) {
+        const node = this.sigma.current.getGraph().addNode(this.newNodeIndex++, { x: position.x, y: position.y, color: "#000", size: NODE_DEFAULT_SIZE })
+        this.setGraph(this.sigma.current.getGraph())
+        this.selectNode(node)
+    }
+
+    addEdge() {
+        if (!this.selectNode || !this.hoveredNode) {
+            return
+        }
+
+        this.sigma.current.getGraph().addEdge(this.state.selectedNode, this.hoveredNode)
+        this.setGraph(this.sigma.current.getGraph())
+    }
+
+    deleteNode() {
+        let confirmDelete = window.confirm("Are you sure you want to delete this node?")
+        if (confirmDelete) {
+            this.sigma.current.getGraph().dropNode(this.state.selectedNode)
+            this.setState({ selectedNode: null })
+            this.setGraph(this.sigma.current.getGraph())
+        }
+    }
+
+    moveNode([x, y]) {
+        if (!this.state.selectedNode)
+            return
+
+
+        x += this.sigma.current.getGraph().getNodeAttribute(this.state.selectedNode, "x")
+        this.sigma.current.getGraph().setNodeAttribute(this.state.selectedNode, "x", x)
+
+        y += this.sigma.current.getGraph().getNodeAttribute(this.state.selectedNode, "y")
+        this.sigma.current.getGraph().setNodeAttribute(this.state.selectedNode, "y", y)
+
+        this.setGraph(this.sigma.current.getGraph())
+    }
+
     keydown(event) {
         if (event.key === 'a') {
             const pos = this.sigma.current.viewportToGraph({ x: this.mouseX, y: this.mouseY })
-            const node = this.sigma.current.getGraph().addNode(this.newNodeIndex++, { x: pos.x, y: pos.y, color: "#000", size: NODE_DEFAULT_SIZE })
-            this.setGraph(this.sigma.current.getGraph())
-            this.selectNode(node)
+            this.addNode(pos)
         } else if (event.key === 'e') {
-            if (!this.selectNode || !this.hoveredNode) {
-                return
-            }
-
-            this.sigma.current.getGraph().addEdge(this.state.selectedNode, this.hoveredNode)
-            this.setGraph(this.sigma.current.getGraph())
+            this.addEdge()
         } else if (event.key === 'd') {
-            let confirmDelete = window.confirm("Are you sure you want to delete this node?")
-            if (confirmDelete) {
-                this.setState({ selectedNode: null })
-                this.sigma.current.getGraph().dropNode(this.state.selectedNode)
-                this.setGraph(this.sigma.current.getGraph())
+            if (this.state.selectedNode) {
+                this.deleteNode()
             }
         } else if (event.key === "ArrowLeft") {
-            if (!this.state.selectedNode)
-                return
-
             const moveAmmount = event.shiftKey ? NODE_MOVE_AMOUNT_SMALL : NODE_MOVE_AMOUNT
-            const x = this.sigma.current.getGraph().getNodeAttribute(this.state.selectedNode, "x")
-            this.sigma.current.getGraph().setNodeAttribute(this.state.selectedNode, "x", x - moveAmmount)
-            this.setGraph(this.sigma.current.getGraph())
+            this.moveNode([-moveAmmount, 0])
         } else if (event.key === "ArrowRight") {
-            if (!this.state.selectedNode)
-                return
-
             const moveAmmount = event.shiftKey ? NODE_MOVE_AMOUNT_SMALL : NODE_MOVE_AMOUNT
-            const x = this.sigma.current.getGraph().getNodeAttribute(this.state.selectedNode, "x")
-            this.sigma.current.getGraph().setNodeAttribute(this.state.selectedNode, "x", x + moveAmmount)
-            this.setGraph(this.sigma.current.getGraph())
+            this.moveNode([moveAmmount, 0])
         } else if (event.key === "ArrowUp") {
-            if (!this.state.selectedNode)
-                return
-
             const moveAmmount = event.shiftKey ? NODE_MOVE_AMOUNT_SMALL : NODE_MOVE_AMOUNT
-            const y = this.sigma.current.getGraph().getNodeAttribute(this.state.selectedNode, "y")
-            this.sigma.current.getGraph().setNodeAttribute(this.state.selectedNode, "y", y + moveAmmount)
-            this.setGraph(this.sigma.current.getGraph())
+            this.moveNode([0, moveAmmount])
         } else if (event.key === "ArrowDown") {
-            if (!this.state.selectedNode)
-                return
-
             const moveAmmount = event.shiftKey ? NODE_MOVE_AMOUNT_SMALL : NODE_MOVE_AMOUNT
-            const y = this.sigma.current.getGraph().getNodeAttribute(this.state.selectedNode, "y")
-            this.sigma.current.getGraph().setNodeAttribute(this.state.selectedNode, "y", y - moveAmmount)
-            this.setGraph(this.sigma.current.getGraph())
+            this.moveNode([0, -moveAmmount])
         }
     }
 
@@ -217,6 +220,7 @@ class GraphComponent extends Component {
         if (this.state.selectedNode) {
             //const MANDATORY_ATTRIBUTES = ['size', 'color', 'x', 'y']
             let attributes = this.sigma.current.getGraph().getNodeAttributes(this.state.selectedNode)
+            attributes.size = attributes.size || NODE_DEFAULT_SIZE * 1.5
 
             propertyControls = <ControlsContainer id="node-controls" position={"bottom-right"}>
                 {Object.keys(attributes).map((key) =>
