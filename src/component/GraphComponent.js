@@ -3,6 +3,7 @@ import { SigmaContainer, ControlsContainer } from "@react-sigma/core";
 
 import "@react-sigma/core/lib/react-sigma.min.css";
 import './GraphComponent.css'
+import drawEdgeLabel from "lib/sigmaJSEdgeLabelRenderer";
 
 const NODE_MOVE_AMOUNT = 0.01
 const NODE_MOVE_AMOUNT_SMALL = 0.001
@@ -237,6 +238,7 @@ class GraphComponent extends Component {
                 edgeLabelColor: "#000",
                 enableEdgeClickEvents: true,
                 enableEdgeHoverEvents: true,
+                edgeLabelRenderer: drawEdgeLabel,
                 edgeReducer: (edge, data) =>
                 ({
                     label: data.label,
@@ -246,6 +248,7 @@ class GraphComponent extends Component {
                     forceLabel: data.forceLabel || true,
                     zIndex: data.zIndex,
                     type: data.type,
+                    labelPositionWeight: data.labelPositionWeight || 0.2
                 }),
 
                 nodeReducer: (node, data) => ({
