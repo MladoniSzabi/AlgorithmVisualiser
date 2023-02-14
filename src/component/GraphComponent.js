@@ -7,6 +7,9 @@ import './GraphComponent.css'
 const NODE_MOVE_AMOUNT = 0.01
 const NODE_MOVE_AMOUNT_SMALL = 0.001
 
+const NODE_DEFAULT_SIZE = 6
+const EDGE_DEFAULT_SIZE = 4
+
 // Have to store this since the useEffect callback gets called 4 times
 // This way we can stop having 4 keypress event listeners on the sigma container
 let keyDownCallback = null
@@ -15,15 +18,16 @@ class GraphComponent extends Component {
     constructor({ setGraph }) {
         super()
         this.state = {
-            selectedNode: null
+            selectedNode: null,
+            selectedEdge: null
         }
         this.sigma = createRef(null)
         this.hoveredNode = null
+        this.hoveredEdge = null
         this.mouseX = 0
         this.mouseY = 0
         this.setParentGraph = setGraph
         // TODO: Don't hardcode this
-        this.defaultSize = 4
         this.keydown = this.keydown.bind(this)
         this.render = this.render.bind(this)
         this.onAttributeChange = this.onAttributeChange.bind(this)
@@ -56,13 +60,13 @@ class GraphComponent extends Component {
             this.sigma.current.setGraph(this.props.graph)
             this.sigma.current.removeAllListeners()
 
-            console.log(this.sigma.current._eventsCount)
-            this.sigma.current.on("clickNode", this.clickNode.bind(this))
             this.sigma.current.getMouseCaptor().on("mousedown", this.mousedown.bind(this))
             this.sigma.current.getMouseCaptor().on("mousemove", this.mousemove.bind(this))
+            this.sigma.current.on("clickNode", this.clickNode.bind(this))
             this.sigma.current.on("enterNode", this.enterNode.bind(this))
             this.sigma.current.on("leaveNode", this.leaveNode.bind(this))
-            console.log(this.sigma.current._eventsCount)
+            this.sigma.current.on("enterEdge", this.enterEdge.bind(this))
+            this.sigma.current.on("leaveEdge", this.leaveEdge.bind(this))
 
             this.sigma.current.getContainer().tabIndex = "0"
             this.sigma.current.getContainer().removeEventListener("keydown", keyDownCallback)
@@ -91,6 +95,19 @@ class GraphComponent extends Component {
         return selectedNode
     }
 
+    enterEdge(event) {
+        this.hoveredEdge = event.edge
+        let size = this.sigma.current.getGraph().getEdgeAttribute(this.hoveredEdge, "size") || EDGE_DEFAULT_SIZE
+        this.sigma.current.getGraph().setEdgeAttribute(this.hoveredEdge, "size", size * 2)
+        console.log(size * 4)
+    }
+
+    leaveEdge(event) {
+        let size = this.sigma.current.getGraph().getEdgeAttribute(this.hoveredEdge, "size")
+        this.sigma.current.getGraph().setEdgeAttribute(this.hoveredEdge, "size", size / 2)
+        this.hoveredEdge = null
+    }
+
     preventDefault(event) {
         event.event.preventSigmaDefault();
         event.event.original.preventDefault();
@@ -98,7 +115,6 @@ class GraphComponent extends Component {
     }
 
     clickNode(event) {
-        console.log("jksahdkjhsjkfd")
         if (this.state.selectedNode === event.node) {
             this.unselectNode()
             this.preventDefault(event)
@@ -120,7 +136,7 @@ class GraphComponent extends Component {
     keydown(event) {
         if (event.key === 'a') {
             const pos = this.sigma.current.viewportToGraph({ x: this.mouseX, y: this.mouseY })
-            const node = this.sigma.current.getGraph().addNode(this.newNodeIndex++, { x: pos.x, y: pos.y, color: "#000", size: this.defaultSize })
+            const node = this.sigma.current.getGraph().addNode(this.newNodeIndex++, { x: pos.x, y: pos.y, color: "#000", size: NODE_DEFAULT_SIZE })
             this.setGraph(this.sigma.current.getGraph())
             this.selectNode(node)
         } else if (event.key === 'e') {
@@ -224,12 +240,25 @@ class GraphComponent extends Component {
                 edgeReducer: (edge, data) =>
                 ({
                     label: data.label,
-                    size: data.size,
+                    size: data.size || EDGE_DEFAULT_SIZE,
                     color: data.color,
-                    hidden: data.hidde,
+                    hidden: data.hidden,
                     forceLabel: data.forceLabel || true,
                     zIndex: data.zIndex,
                     type: data.type,
+                }),
+
+                nodeReducer: (node, data) => ({
+                    label: data.label,
+                    size: data.size || NODE_DEFAULT_SIZE,
+                    color: data.color,
+                    hidden: data.hidden,
+                    forceLabel: data.forceLabel || true,
+                    zIndex: data.zIndex,
+                    type: data.type,
+                    highlighted: data.highlighted,
+                    x: data.x,
+                    y: data.y
                 })
             }}>
             {propertyControls}
