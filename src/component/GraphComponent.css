@@ -1,4 +1,4 @@
-#node-controls {
+#property-controls {
     width: calc(100% - 3 * var(--sigma-controls-margin) - 1em);
     padding: 0.5em;
 

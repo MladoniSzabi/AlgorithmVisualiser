@@ -64,6 +64,7 @@ class GraphComponent extends Component {
             this.sigma.current.on("leaveNode", this.leaveNode.bind(this))
             this.sigma.current.on("enterEdge", this.enterEdge.bind(this))
             this.sigma.current.on("leaveEdge", this.leaveEdge.bind(this))
+            this.sigma.current.on("clickEdge", this.clickEdge.bind(this))
 
             this.sigma.current.getContainer().tabIndex = "0"
             this.sigma.current.getContainer().removeEventListener("keydown", keyDownCallback)
@@ -74,6 +75,7 @@ class GraphComponent extends Component {
 
     selectNode(node) {
         this.unselectNode()
+        this.unselectEdge()
         this.setState({ selectedNode: node })
         let size = this.sigma.current.getGraph().getNodeAttribute(node, "size")
         this.sigma.current.getGraph().setNodeAttribute(node, "size", size * 1.5)
@@ -133,6 +135,40 @@ class GraphComponent extends Component {
         const node = this.sigma.current.getGraph().addNode(this.newNodeIndex++, { x: position.x, y: position.y, color: "#000", size: NODE_DEFAULT_SIZE })
         this.setGraph(this.sigma.current.getGraph())
         this.selectNode(node)
+    }
+
+    selectEdge(edge) {
+        this.unselectNode()
+        this.unselectEdge()
+        this.setState({ selectedEdge: edge })
+        let size = this.sigma.current.getGraph().getEdgeAttribute(edge, "size")
+        this.sigma.current.getGraph().setEdgeAttribute(edge, "size", size * 1.5)
+
+        return edge
+    }
+
+    unselectEdge() {
+        let selectedEdge = this.state.selectedEdge
+        if (selectedEdge) {
+            let size = this.sigma.current.getGraph().getEdgeAttribute(this.state.selectedEdge, "size")
+            this.sigma.current.getGraph().setEdgeAttribute(this.state.selectedEdge, "size", size / 1.5)
+            this.setState({ selectedEdge: null })
+        }
+
+        return selectedEdge
+    }
+
+    clickEdge(event) {
+        console.log(this.state.selectedEdge, event.edge, this.state.selectedEdge == event.edge)
+        if (this.state.selectedEdge == event.edge) {
+            this.unselectEdge()
+            this.preventDefault(event)
+            return
+        }
+
+        console.log(event)
+        this.selectEdge(event.edge)
+        this.preventDefault(event)
     }
 
     addEdge() {
@@ -202,14 +238,20 @@ class GraphComponent extends Component {
     }
 
     onAttributeChange(key, event) {
-        this.sigma.current.getGraph().setNodeAttribute(this.state.selectedNode, key, event.target.value)
+        if (this.state.selectedNode)
+            this.sigma.current.getGraph().setNodeAttribute(this.state.selectedNode, key, event.target.value)
+        else
+            this.sigma.current.getGraph().setEdgeAttribute(this.state.selectedEdge, key, event.target.value)
         this.setGraph(this.sigma.current.getGraph())
         this.forceUpdate()
     }
 
     addNewAttribute() {
         let newAttribute = prompt("Enter name of new attribute: ")
-        this.sigma.current.getGraph().setNodeAttribute(this.state.selectedNode, newAttribute, "")
+        if (this.state.selectedNode)
+            this.sigma.current.getGraph().setNodeAttribute(this.state.selectedNode, newAttribute, "")
+        else
+            this.sigma.current.getGraph().setEdgeAttribute(this.state.selectedEdge, newAttribute, "")
         this.setGraph(this.sigma.current.getGraph())
         this.forceUpdate()
     }
@@ -217,14 +259,20 @@ class GraphComponent extends Component {
     render() {
 
         let propertyControls = null
+        let attributes = null
+        //const MANDATORY_ATTRIBUTES = ['size', 'color', 'x', 'y']
         if (this.state.selectedNode) {
-            //const MANDATORY_ATTRIBUTES = ['size', 'color', 'x', 'y']
-            let attributes = this.sigma.current.getGraph().getNodeAttributes(this.state.selectedNode)
+            attributes = this.sigma.current.getGraph().getNodeAttributes(this.state.selectedNode)
             attributes.size = attributes.size || NODE_DEFAULT_SIZE * 1.5
+        } else if (this.state.selectedEdge) {
+            attributes = this.sigma.current.getGraph().getEdgeAttributes(this.state.selectedEdge)
+            attributes.size = attributes.size || EDGE_DEFAULT_SIZE * 1.5
+        }
 
-            propertyControls = <ControlsContainer id="node-controls" position={"bottom-right"}>
+        if (attributes) {
+            propertyControls = <ControlsContainer id="property-controls" position={"bottom-right"}>
                 {Object.keys(attributes).map((key) =>
-                    <div className="node-property" key={String(this.state.selectedNode) + ":" + String(key)}>
+                    <div className="property-control" key={String(this.state.selectedNode) + ":" + String(key)}>
                         <p>{key}: <input onChange={(event) => this.onAttributeChange(key, event)} value={attributes[key]} /></p>
                     </div>
                 )}
