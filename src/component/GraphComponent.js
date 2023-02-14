@@ -189,6 +189,15 @@ class GraphComponent extends Component {
         }
     }
 
+    deleteEdge() {
+        let confirmDelete = window.confirm("Are you sure you want to delete this edge?")
+        if (confirmDelete) {
+            this.sigma.current.getGraph().dropEdge(this.state.selectedEdge)
+            this.setState({ selectedEdge: null })
+            this.setGraph(this.sigma.current.getGraph())
+        }
+    }
+
     moveNode([x, y]) {
         if (!this.state.selectedNode)
             return
@@ -212,6 +221,8 @@ class GraphComponent extends Component {
         } else if (event.key === 'd') {
             if (this.state.selectedNode) {
                 this.deleteNode()
+            } else if (this.state.selectedEdge) {
+                this.deleteEdge()
             }
         } else if (event.key === "ArrowLeft") {
             const moveAmmount = event.shiftKey ? NODE_MOVE_AMOUNT_SMALL : NODE_MOVE_AMOUNT
