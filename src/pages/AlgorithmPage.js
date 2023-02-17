@@ -118,7 +118,7 @@ class AlgorithmPage extends Component {
     }
 
     onHistoryIndexChanged(event) {
-        if (event.eventPhase == 3) {
+        if (event.eventPhase === 3) {
             this.setState({ historyIndex: event.target.value })
         }
     }
@@ -149,7 +149,7 @@ class AlgorithmPage extends Component {
                     <CodeEditorComponent savedCode={this.state.code} onRunCode={this.onRunCode}></CodeEditorComponent>
                 </div>
                 <div id="history-slider">
-                    {(this.state.history.length != 0 && this.state.history.length != 1) &&
+                    {(this.state.history.length !== 0 && this.state.history.length !== 1) &&
                         <>
                             <span className="material-symbols-outlined" onClick={this.onHistoryBack}>arrow_left</span>
                             <input type="range" min="0" max={this.state.history.length - 1} value={this.state.historyIndex} onChange={this.onHistoryIndexChanged} />

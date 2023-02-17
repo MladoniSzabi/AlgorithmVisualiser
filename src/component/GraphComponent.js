@@ -53,7 +53,7 @@ class GraphComponent extends Component {
     componentDidUpdate(prevProps) {
         this.newNodeIndex = this.props.graph.order
 
-        if (this.props.graph != prevProps.graph) {
+        if (this.props.graph !== prevProps.graph) {
             this.sigma.current.setGraph(this.props.graph)
         }
 
