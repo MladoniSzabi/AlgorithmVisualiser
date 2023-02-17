@@ -6,7 +6,9 @@ export default class GraphWithHistory extends Graph {
     changeImplementation(functionName, addHistory) {
         this[functionName] = (...args) => {
             super[functionName](...args)
-            addHistory(Graph.from(this))
+            let graph = new Graph()
+            graph.import(this.export())
+            addHistory(graph)
         }
     }
 
@@ -26,7 +28,7 @@ export default class GraphWithHistory extends Graph {
             "dropEdge", "clear", "clearEdges", "updateAttribute", "removeAttribute", "replaceAttributes", "mergeAttributes", "updateAttributes", "setNodeAttribute",
             "updateNodeAttribute", "removeNodeAttribute", "replaceNodeAttributes", "mergeNodeAttributes", "updateNodeAttributes", "updateEachNodeAttributes",
             "setEdgeAttribute", "updateEdgeAttribute", "removeEdgeAttribute", "replaceEdgeAttributes", "mergeEdgeAttributes", "updateEdgeAttributes",
-            "updateEachEdgeAttributes", "import"
+            "updateEachEdgeAttributes"
         ]
 
         functions.forEach(element => {
