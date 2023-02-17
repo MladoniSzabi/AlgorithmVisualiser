@@ -6,7 +6,7 @@ import GraphComponent from "component/GraphComponent";
 import CodeEditorComponent from "component/CodeEditorComponent";
 
 import graphFactory from "lib/graphFactory";
-import GraphWithHistory from "lib/graphWithHistory";
+import CodeRunner from "lib/codeRunner";
 
 function withRouter(Component) {
     function ComponentWithRouterProp(props) {
@@ -54,62 +54,10 @@ class AlgorithmPage extends Component {
     }
 
     onRunCode(code) {
-        this.setState(prevState => ({ history: [prevState.graph] }))
-        let newOutput = this.state.output.slice()
-
-        // Back up console object so that we can restore it later
-        let consoleBackup = {
-            log: console.log,
-            warn: console.warn,
-            error: console.error,
-        }
-
-        // Overwrite console object so that we can store its output and render it in
-        // the output tab
-        console.log = (message, ...other) => {
-            newOutput.push(JSON.stringify(message))
-            other.forEach((el) => { newOutput.push(JSON.stringify(el)) })
-            this.setState({ output: newOutput })
-        }
-        console.warn = console.log
-        console.error = console.log
-
-        // Wrap user code in a function so we can pass in the graph
-        let codeAsFunction = "(graph) => {" + code + "}"
-
-        // Run code in editor
-        //
-        // Normally this is not a good idea because it allows remote code execution,
-        // however we don't have a backend or a way to share code.
-        // All the code will exclusively be stored on the user's computer.
-        // 
-        // Only problem is if the code is copy pasted from a shady source so for this case
-        // it would be a good idea to disable any way of damaging your own computer
-        // Leaking information should not be a problem since we are not storing any
-        // sensitive data.
-        try {
-            // eslint-disable-next-line
-            let func = eval(codeAsFunction)
-            let graph = GraphWithHistory.from(this.state.graph)
-            graph.overwriteMethods((graph) => {
-                this.setState(prevState => {
-                    let newHistory = [...prevState.history]
-                    newHistory.push(graph)
-                    consoleBackup.log(newHistory)
-                    return { history: newHistory }
-                })
-            })
-            func(graph)
-        } catch (error) {
-            newOutput.push(error.toString())
-        } finally {
-            // Restore console object so it works as expected
-            console.log = consoleBackup.log
-            console.warn = consoleBackup.warn
-            console.error = consoleBackup.error
-
-            this.setState({ output: newOutput, code })
-        }
+        this.setState({ code })
+        let runner = new CodeRunner(code, this.state.graph)
+        let [output, history] = runner.run()
+        this.setState({ output, history })
     }
 
     setGraph(newGraph) {
