@@ -38,6 +38,7 @@ class AlgorithmPage extends Component {
         this.onRunCode = this.onRunCode.bind(this)
         this.fetchGraph = this.fetchGraph.bind(this)
         this.setGraph = this.setGraph.bind(this)
+        this.onHistoryIndexChanged = this.onHistoryIndexChanged.bind(this)
     }
 
     componentDidMount() {
@@ -50,7 +51,7 @@ class AlgorithmPage extends Component {
     }
 
     onRunCode(code) {
-        this.setState({ history: [] })
+        this.setState(prevState => ({ history: [prevState.graph] }))
         let newOutput = this.state.output.slice()
 
         // Back up console object so that we can restore it later
@@ -113,15 +114,34 @@ class AlgorithmPage extends Component {
         this.setState({ graph: newGraph })
     }
 
+    onHistoryIndexChanged(event) {
+        if (event.eventPhase == 3) {
+            this.setState({ historyIndex: event.target.value })
+        }
+    }
+
     render() {
+        let graph = this.state.graph
+        if (this.state.historyIndex !== -1) {
+            graph = this.state.history[this.state.historyIndex]
+        }
         return (
             <div id="algorithm">
                 <div id="algorithm_name"><h1>{this.props.router.params.algorithmName}</h1></div>
                 <div id="code-editor">
                     <CodeEditorComponent savedCode={this.state.code} onRunCode={this.onRunCode}></CodeEditorComponent>
                 </div>
+                <div id="history-slider">
+                    {(this.state.history.length != 0 && this.state.history.length != 1) &&
+                        <>
+                            <span className="material-symbols-outlined">arrow_left</span>
+                            <input type="range" min="0" max={this.state.history.length - 1} value={this.state.historyIndex} onChange={this.onHistoryIndexChanged} />
+                            <span className="material-symbols-outlined">arrow_right</span>
+                        </>
+                    }
+                </div>
                 <div id="graph-visualisation">
-                    {this.state.graph && <GraphComponent setGraph={this.setGraph} graph={this.state.graph}></GraphComponent>}
+                    {graph && <GraphComponent setGraph={this.setGraph} graph={graph}></GraphComponent>}
                 </div>
                 <div id="code-output">{this.state.output.map((el, index) => <p key={index}>{el}</p>)}</div>
             </div>
