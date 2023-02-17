@@ -54,7 +54,7 @@
             "source": "1",
             "target": "2",
             "attributes": {
-                "label": 34
+                "label": 30
             }
         },
         {
@@ -70,7 +70,23 @@
             "source": "3",
             "target": "0",
             "attributes": {
+                "label": 35
+            }
+        },
+        {
+            "key": "geid_56_4",
+            "source": "0",
+            "target": "2",
+            "attributes": {
                 "label": 42
+            }
+        },
+        {
+            "key": "geid_56_5",
+            "source": "1",
+            "target": "3",
+            "attributes": {
+                "label": 34
             }
         }
     ]
