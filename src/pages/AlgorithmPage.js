@@ -39,6 +39,9 @@ class AlgorithmPage extends Component {
         this.fetchGraph = this.fetchGraph.bind(this)
         this.setGraph = this.setGraph.bind(this)
         this.onHistoryIndexChanged = this.onHistoryIndexChanged.bind(this)
+        this.onHistoryForward = this.onHistoryForward.bind(this)
+        this.onHistoryBack = this.onHistoryBack.bind(this)
+
     }
 
     componentDidMount() {
@@ -120,6 +123,20 @@ class AlgorithmPage extends Component {
         }
     }
 
+    onHistoryBack() {
+        this.setState(prevState => {
+            if (prevState.historyIndex > 0)
+                return { historyIndex: prevState.historyIndex - 1 }
+        })
+    }
+
+    onHistoryForward() {
+        this.setState(prevState => {
+            if (prevState.historyIndex < prevState.history.length - 1)
+                return { historyIndex: prevState.historyIndex + 1 }
+        })
+    }
+
     render() {
         let graph = this.state.graph
         if (this.state.historyIndex !== -1) {
@@ -134,9 +151,9 @@ class AlgorithmPage extends Component {
                 <div id="history-slider">
                     {(this.state.history.length != 0 && this.state.history.length != 1) &&
                         <>
-                            <span className="material-symbols-outlined">arrow_left</span>
+                            <span className="material-symbols-outlined" onClick={this.onHistoryBack}>arrow_left</span>
                             <input type="range" min="0" max={this.state.history.length - 1} value={this.state.historyIndex} onChange={this.onHistoryIndexChanged} />
-                            <span className="material-symbols-outlined">arrow_right</span>
+                            <span className="material-symbols-outlined" onClick={this.onHistoryForward}>arrow_right</span>
                         </>
                     }
                 </div>

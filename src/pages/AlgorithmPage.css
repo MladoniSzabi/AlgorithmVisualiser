@@ -25,6 +25,17 @@
 
 #history-slider span {
     font-size: 1.5rem;
+    color: #676774;
+    cursor: pointer;
+    user-select: none;
+}
+
+#history-slider span:hover {
+    color: #484851;
+}
+
+#history-slider span:active {
+    color: #1f9ede;
 }
 
 #history-slider input {
