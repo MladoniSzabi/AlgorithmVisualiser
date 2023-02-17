@@ -4,7 +4,9 @@ import { useLocation, useNavigate, useParams } from "react-router-dom"
 import './AlgorithmPage.css'
 import GraphComponent from "component/GraphComponent";
 import CodeEditorComponent from "component/CodeEditorComponent";
+
 import graphFactory from "lib/graphFactory";
+import GraphWithHistory from "lib/graphWithHistory";
 
 function withRouter(Component) {
     function ComponentWithRouterProp(props) {
@@ -28,7 +30,9 @@ class AlgorithmPage extends Component {
         this.state = {
             output: [],
             graph: null,
-            code: ""
+            code: "",
+            history: [],
+            historyIndex: -1
         }
 
         this.onRunCode = this.onRunCode.bind(this)
@@ -37,7 +41,6 @@ class AlgorithmPage extends Component {
     }
 
     componentDidMount() {
-        console.log("Mounted")
         this.fetchGraph()
     }
 
@@ -47,6 +50,7 @@ class AlgorithmPage extends Component {
     }
 
     onRunCode(code) {
+        this.setState({ history: [] })
         let newOutput = this.state.output.slice()
 
         // Back up console object so that we can restore it later
@@ -67,7 +71,7 @@ class AlgorithmPage extends Component {
         console.error = console.log
 
         // Wrap user code in a function so we can pass in the graph
-        code = "(graph) => {" + code + "}"
+        let codeAsFunction = "(graph) => {" + code + "}"
 
         // Run code in editor
         //
@@ -81,8 +85,17 @@ class AlgorithmPage extends Component {
         // sensitive data.
         try {
             // eslint-disable-next-line
-            let func = eval(code)
-            func(this.state.graph)
+            let func = eval(codeAsFunction)
+            let graph = GraphWithHistory.from(this.state.graph)
+            graph.overwriteMethods((graph) => {
+                this.setState(prevState => {
+                    let newHistory = [...prevState.history]
+                    newHistory.push(graph)
+                    consoleBackup.log(newHistory)
+                    return { history: newHistory }
+                })
+            })
+            func(graph)
         } catch (error) {
             newOutput.push(error.toString())
         } finally {
@@ -91,11 +104,12 @@ class AlgorithmPage extends Component {
             console.warn = consoleBackup.warn
             console.error = consoleBackup.error
 
-            this.setState({ output: newOutput })
+            this.setState({ output: newOutput, code })
         }
     }
 
     setGraph(newGraph) {
+        // TODO: use historyIndex to set graph
         this.setState({ graph: newGraph })
     }
 

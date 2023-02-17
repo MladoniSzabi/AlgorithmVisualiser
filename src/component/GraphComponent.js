@@ -159,8 +159,7 @@ class GraphComponent extends Component {
     }
 
     clickEdge(event) {
-        console.log(this.state.selectedEdge, event.edge, this.state.selectedEdge == event.edge)
-        if (this.state.selectedEdge == event.edge) {
+        if (this.state.selectedEdge === event.edge) {
             this.unselectEdge()
             this.preventDefault(event)
             return
