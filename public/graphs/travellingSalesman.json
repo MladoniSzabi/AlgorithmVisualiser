@@ -1,4 +1,5 @@
 {
+    "name": "Travelling Salesman",
     "options": {
         "type": "Undirected",
         "multi": false,
