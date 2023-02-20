@@ -10,7 +10,7 @@ export default class CodeRunner {
         this.groupHistory = false
         this.latestGraph = null
         this.output = []
-        this.history = [this.graph]
+        this.history = [{ graph: this.graph, output: [] }]
     }
 
     run() {
@@ -54,7 +54,7 @@ export default class CodeRunner {
                     return
                 }
 
-                this.history.push(graph)
+                this.history.push({ graph, output: this.output.slice() })
             })
 
             let groupHistory = () => {
@@ -70,7 +70,7 @@ export default class CodeRunner {
                 }
 
                 if (this.latestGraph !== null) {
-                    this.history.push(this.latestGraph)
+                    this.history.push({ graph: this.latestGraph, output: this.output.slice() })
                 }
                 this.groupingHistory = false
                 this.latestGraph = null
@@ -85,7 +85,7 @@ export default class CodeRunner {
             console.warn = consoleBackup.warn
             console.error = consoleBackup.error
 
-            return [this.output, this.history]
+            return this.history
         }
     }
 }

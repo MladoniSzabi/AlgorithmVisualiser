@@ -28,7 +28,6 @@ class AlgorithmPage extends Component {
     constructor() {
         super()
         this.state = {
-            output: [],
             graph: null,
             code: "",
             history: [],
@@ -56,8 +55,8 @@ class AlgorithmPage extends Component {
     onRunCode(code) {
         this.setState({ code })
         let runner = new CodeRunner(code, this.state.graph)
-        let [output, history] = runner.run()
-        this.setState({ output, history })
+        let history = runner.run()
+        this.setState({ history, historyIndex: history.length - 1 })
     }
 
     setGraph(newGraph) {
@@ -87,8 +86,10 @@ class AlgorithmPage extends Component {
 
     render() {
         let graph = this.state.graph
+        let output = []
         if (this.state.historyIndex !== -1) {
-            graph = this.state.history[this.state.historyIndex]
+            graph = this.state.history[this.state.historyIndex].graph
+            output = this.state.history[this.state.historyIndex].output
         }
         return (
             <div id="algorithm">
@@ -108,7 +109,7 @@ class AlgorithmPage extends Component {
                 <div id="graph-visualisation">
                     {graph && <GraphComponent setGraph={this.setGraph} graph={graph}></GraphComponent>}
                 </div>
-                <div id="code-output">{this.state.output.map((el, index) => <p key={index}>{el}</p>)}</div>
+                <div id="code-output">{output.map((el, index) => <p key={index}>{el}</p>)}</div>
             </div>
         )
     }
