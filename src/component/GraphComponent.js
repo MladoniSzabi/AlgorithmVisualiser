@@ -25,10 +25,11 @@ class GraphComponent extends Component {
         this.sigma = createRef(null)
         this.hoveredNode = null
         this.hoveredEdge = null
+        this.draggedNode = null
+        this.wasNodeDragged = false
         this.mouseX = 0
         this.mouseY = 0
         this.setParentGraph = setGraph
-        // TODO: Don't hardcode this
         this.keydown = this.keydown.bind(this)
         this.render = this.render.bind(this)
         this.onAttributeChange = this.onAttributeChange.bind(this)
@@ -62,8 +63,10 @@ class GraphComponent extends Component {
             this.sigma.current.removeAllListeners()
 
             this.sigma.current.getMouseCaptor().on("mousedown", this.mousedown.bind(this))
+            this.sigma.current.getMouseCaptor().on("mouseup", this.mouseup.bind(this))
             this.sigma.current.getMouseCaptor().on("mousemove", this.mousemove.bind(this))
             this.sigma.current.on("clickNode", this.clickNode.bind(this))
+            this.sigma.current.on("downNode", this.downNode.bind(this))
             this.sigma.current.on("enterNode", this.enterNode.bind(this))
             this.sigma.current.on("leaveNode", this.leaveNode.bind(this))
             this.sigma.current.on("enterEdge", this.enterEdge.bind(this))
@@ -111,20 +114,47 @@ class GraphComponent extends Component {
     }
 
     preventDefault(event) {
-        event.event.preventSigmaDefault();
-        event.event.original.preventDefault();
-        event.event.original.stopPropagation();
+        event.preventSigmaDefault();
+        event.original.preventDefault();
+        event.original.stopPropagation();
     }
 
     clickNode(event) {
         if (this.state.selectedNode === event.node) {
             this.unselectNode()
-            this.preventDefault(event)
+            this.preventDefault(event.event)
             return
         }
 
         this.selectNode(event.node)
-        this.preventDefault(event)
+        this.preventDefault(event.event)
+    }
+
+    downNode(event) {
+        this.draggedNode = event.node
+        this.sigma.current.getGraph().setNodeAttribute(this.draggedNode, "highlighted", true)
+        this.preventDefault(event.event)
+    }
+
+    preventClick(event) {
+        let callback = (e) => {
+            e.stopPropagation()
+            window.removeEventListener('click', callback, true)
+        }
+        window.addEventListener('click', callback, true)
+    }
+
+    mouseup(event) {
+        if (this.draggedNode) {
+            this.sigma.current.getGraph().setNodeAttribute(this.draggedNode, "highlighted", false)
+            this.draggedNode = null
+            this.preventDefault(event)
+            if (this.wasNodeDragged) {
+                this.preventClick(event)
+                this.wasNodeDragged = false
+                this.setGraph(this.sigma.current.getGraph())
+            }
+        }
     }
 
     enterNode(event) {
@@ -165,13 +195,12 @@ class GraphComponent extends Component {
     clickEdge(event) {
         if (this.state.selectedEdge === event.edge) {
             this.unselectEdge()
-            this.preventDefault(event)
+            this.preventDefault(event.event)
             return
         }
 
-        console.log(event)
         this.selectEdge(event.edge)
-        this.preventDefault(event)
+        this.preventDefault(event.event)
     }
 
     addEdge() {
@@ -249,6 +278,14 @@ class GraphComponent extends Component {
     mousemove(event) {
         this.mouseX = event.x
         this.mouseY = event.y
+
+        if (this.draggedNode) {
+            this.wasNodeDragged = true
+            const pos = this.sigma.current.viewportToGraph(event)
+            this.sigma.current.getGraph().setNodeAttribute(this.draggedNode, "x", pos.x)
+            this.sigma.current.getGraph().setNodeAttribute(this.draggedNode, "y", pos.y)
+            this.preventDefault(event)
+        }
     }
 
     onAttributeChange(key, event) {
