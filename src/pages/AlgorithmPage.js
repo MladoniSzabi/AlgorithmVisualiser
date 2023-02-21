@@ -5,7 +5,7 @@ import './AlgorithmPage.css'
 import GraphComponent from "component/GraphComponent";
 import CodeEditorComponent from "component/CodeEditorComponent";
 
-import graphFactory from "lib/graphFactory";
+import { graphFactory } from "lib/graphFactory";
 import CodeRunner from "lib/codeRunner";
 
 function withRouter(Component) {
