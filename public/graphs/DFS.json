@@ -1,0 +1,206 @@
+{
+    "name": "DFS",
+    "options": {
+        "type": "Undirected",
+        "multi": false,
+        "allowSelfLoops": false
+    },
+    "attributes": {},
+    "code": "",
+    "nodes": [
+        {
+            "key": "2",
+            "attributes": {
+                "x": 0.5,
+                "y": 0.8,
+                "color": "#000",
+                "highlighted": false,
+                "size": 6
+            }
+        },
+        {
+            "key": "3",
+            "attributes": {
+                "x": 0.5,
+                "y": 0.7,
+                "color": "#000",
+                "highlighted": false,
+                "size": 6
+            }
+        },
+        {
+            "key": "4",
+            "attributes": {
+                "x": 0.4,
+                "y": 0.7,
+                "color": "#000",
+                "size": 6,
+                "highlighted": false
+            }
+        },
+        {
+            "key": "5",
+            "attributes": {
+                "x": 0.6,
+                "y": 0.7,
+                "color": "#000",
+                "size": 6,
+                "highlighted": false
+            }
+        },
+        {
+            "key": "6",
+            "attributes": {
+                "x": 0.35,
+                "y": 0.6,
+                "color": "#000",
+                "size": 6,
+                "highlighted": false
+            }
+        },
+        {
+            "key": "7",
+            "attributes": {
+                "x": 0.4,
+                "y": 0.6,
+                "color": "#000",
+                "size": 6,
+                "highlighted": false
+            }
+        },
+        {
+            "key": "8",
+            "attributes": {
+                "x": 0.37,
+                "y": 0.5,
+                "color": "#000",
+                "size": 6,
+                "highlighted": false
+            }
+        },
+        {
+            "key": "9",
+            "attributes": {
+                "x": 0.42,
+                "y": 0.5,
+                "color": "#000",
+                "size": 6,
+                "highlighted": false
+            }
+        },
+        {
+            "key": "10",
+            "attributes": {
+                "x": 0.6,
+                "y": 0.6,
+                "color": "#000",
+                "size": 6
+            }
+        },
+        {
+            "key": "11",
+            "attributes": {
+                "x": 0.65,
+                "y": 0.6,
+                "color": "#000",
+                "size": 6
+            }
+        },
+        {
+            "key": "12",
+            "attributes": {
+                "x": 0.65,
+                "y": 0.5,
+                "color": "#000",
+                "size": 6,
+                "highlighted": false
+            }
+        },
+        {
+            "key": "13",
+            "attributes": {
+                "x": 0.7,
+                "y": 0.5,
+                "color": "#000",
+                "size": 6,
+                "highlighted": false
+            }
+        }
+    ],
+    "edges": [
+        {
+            "key": "geid_56_2",
+            "source": "2",
+            "target": "3",
+            "attributes": {
+                "label": "",
+                "size": 4
+            }
+        },
+        {
+            "key": "geid_231_0",
+            "source": "4",
+            "target": "2"
+        },
+        {
+            "key": "geid_231_2",
+            "source": "2",
+            "target": "5",
+            "attributes": {
+                "size": 4
+            }
+        },
+        {
+            "key": "geid_231_3",
+            "source": "6",
+            "target": "4",
+            "attributes": {
+                "size": 4
+            }
+        },
+        {
+            "key": "geid_231_4",
+            "source": "4",
+            "target": "7"
+        },
+        {
+            "key": "geid_231_5",
+            "source": "8",
+            "target": "7"
+        },
+        {
+            "key": "geid_231_6",
+            "source": "9",
+            "target": "7",
+            "attributes": {
+                "size": 4
+            }
+        },
+        {
+            "key": "geid_231_7",
+            "source": "10",
+            "target": "5"
+        },
+        {
+            "key": "geid_231_8",
+            "source": "11",
+            "target": "5"
+        },
+        {
+            "key": "geid_231_9",
+            "source": "12",
+            "target": "11",
+            "attributes": {
+                "size": 4
+            }
+        },
+        {
+            "key": "geid_231_10",
+            "source": "13",
+            "target": "11",
+            "attributes": {
+                "size": 4
+            }
+        }
+    ]
+}
