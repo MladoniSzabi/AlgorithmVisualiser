@@ -1,0 +1,146 @@
+{
+    "name": "Dijkstra's Algorithm",
+    "options": {
+        "type": "mixed",
+        "multi": false,
+        "allowSelfLoops": true
+    },
+    "attributes": {},
+    "code": "// The green node is the start node\n// The red node is the target node\n// The yellow node is the active node\n// The grey nodes are the visited nodes\n// The red edge is the edge that is being evaluated\n// The orange edges are the path from the start to the target\n\n// Minimum distance to get to a specific node from the start node\nlet distance_from_start = {}\n// Stores what node to travel to, to get to the start node\nlet previous_node = {}\n// Queue of nodes that still need to be visited\nlet queue = []\n// The start node\nlet start_node = graph.filterNodes((node, attr) => (attr.color == \"green\"))[0]\n\n// Get the target node if there is one\nlet target = graph.filterNodes((node, attr) => (attr.color == \"red\"))\nif(target.length) {\n    target = target[0]\n} else {\n    target = null\n}\n\n// Initialise dictionaries and fill queue\nfor(let node of graph.nodes()) {\n    distance_from_start[node] = Infinity\n    previous_node[node] = undefined\n    queue.push(node)\n}\n\n// Distance from start node to the start node is 0\ndistance_from_start[start_node] = 0\n\n// Stores the previously processed node so we can reset its color\nlet previous_processed_node = null\n\n// While there are nodes left to be visited\nwhile(queue.length) {\n    \n    // Find the node in the queue with the minimum distance from the start\n    let curr_node = queue[0];\n    for(let node of queue) {\n        if(distance_from_start[node] < distance_from_start[curr_node]) {\n            curr_node = node\n        }\n    }\n    \n    // Show the current node in green\n    groupHistory()\n    graph.setNodeAttribute(curr_node, \"color\", \"green\")\n    if(previous_processed_node) {\n        graph.setNodeAttribute(previous_processed_node, \"color\", \"grey\")\n    }\n    previous_processed_node = curr_node\n    finishHistoryGroup()\n    \n    if(curr_node == target) {\n        break\n    }\n    \n    // Remove that node from the queue (We will process it now)\n    queue = queue.filter((node) => node!==curr_node)\n    \n    let previous_edge = null\n    // Go through all neighbors of the node\n    for(let node of graph.neighbors(curr_node)) {\n        \n        // Except the ones that we already found the minimum distance for (not in the queue)\n        if(!queue.includes(node)) {\n            continue\n        }\n        \n        // Get the edge from the current node to its neighbor\n        let edge = graph.edge(curr_node, node) || graph.edge(node, curr_node)\n        \n        // Show the edge we are processing in red\n        groupHistory()\n        graph.setEdgeAttribute(edge, \"color\", \"red\")\n        if(previous_edge) {\n            graph.setEdgeAttribute(previous_edge, \"color\", \"#000\")\n        }\n        previous_edge = edge\n        finishHistoryGroup()\n        \n        // And update the distance if the path through the current node to the neighbor\n        // is shorter than the one we already know about\n        let alt = distance_from_start[curr_node] + Number(graph.getEdgeAttribute(edge, \"label\"))\n        if(alt < distance_from_start[node]) {\n            distance_from_start[node] = alt\n            previous_node[node] = curr_node\n        }\n    }\n    \n    if(previous_edge) {\n        graph.setEdgeAttribute(previous_edge, \"color\", \"#000\")\n    }\n}\n\n// Reconstruct the path from the start to the target\nlet S = []\nif(previous_node[target] || target == start_node) {\n    while(target) {\n        S.unshift(target)\n        if(previous_node[target]) {\n            let edge = graph.edge(target, previous_node[target]) || graph.edge(previous_node[target], target)\n            graph.setEdgeAttribute(edge, \"color\", \"orange\")\n        }\n        target = previous_node[target]\n    }\n}\n\n// Show us the shortest path\nconsole.log(\"Path from start to end is: \", S)",
+    "nodes": [
+        {
+            "key": "0",
+            "attributes": {
+                "x": 0.1,
+                "y": 0.1,
+                "color": "green"
+            }
+        },
+        {
+            "key": "1",
+            "attributes": {
+                "x": 0.9,
+                "y": 0.1,
+                "color": "#000"
+            }
+        },
+        {
+            "key": "2",
+            "attributes": {
+                "x": 0.1,
+                "y": 0.9,
+                "color": "#000"
+            }
+        },
+        {
+            "key": "3",
+            "attributes": {
+                "x": 0.6306629273035977,
+                "y": 0.5828960974744917,
+                "color": "#000",
+                "highlighted": false,
+                "size": 6
+            }
+        },
+        {
+            "key": "4",
+            "attributes": {
+                "x": 1.21379408654134,
+                "y": 0.7210061087402003,
+                "color": "#000",
+                "size": 6
+            }
+        },
+        {
+            "key": "5",
+            "attributes": {
+                "x": 0.7611001602909873,
+                "y": 0.9761259906615791,
+                "color": "red",
+                "size": 6
+            }
+        }
+    ],
+    "edges": [
+        {
+            "key": "geid_56_0",
+            "source": "0",
+            "target": "1",
+            "attributes": {
+                "label": "7",
+                "size": 4
+            }
+        },
+        {
+            "key": "geid_56_2",
+            "source": "2",
+            "target": "3",
+            "attributes": {
+                "label": "2",
+                "size": 4
+            }
+        },
+        {
+            "key": "geid_56_3",
+            "source": "3",
+            "target": "0",
+            "attributes": {
+                "label": "9",
+                "size": 4
+            }
+        },
+        {
+            "key": "geid_56_4",
+            "source": "0",
+            "target": "2",
+            "attributes": {
+                "label": "14",
+                "size": 4
+            }
+        },
+        {
+            "key": "geid_56_5",
+            "source": "1",
+            "target": "3",
+            "attributes": {
+                "label": "10",
+                "size": 4
+            }
+        },
+        {
+            "key": "geid_219_0",
+            "source": "4",
+            "target": "1",
+            "attributes": {
+                "size": 4,
+                "label": "15"
+            }
+        },
+        {
+            "key": "geid_219_1",
+            "source": "4",
+            "target": "3",
+            "attributes": {
+                "size": 4
+            }
+        },
+        {
+            "key": "geid_219_2",
+            "source": "5",
+            "target": "2",
+            "attributes": {
+                "size": 4,
+                "label": "9"
+            }
+        },
+        {
+            "key": "geid_219_3",
+            "source": "5",
+            "target": "4",
+            "attributes": {
+                "size": 4,
+                "label": "6"
+            }
+        }
+    ]
+}
