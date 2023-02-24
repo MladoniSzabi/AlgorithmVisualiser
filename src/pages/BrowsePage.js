@@ -2,6 +2,8 @@ import { getGraphList } from "lib/graphFactory"
 import { useEffect, useState } from "react"
 import { Link } from "react-router-dom"
 
+import "./BrowsePage.css"
+
 function BrowsePage() {
 
     let [graphList, setGraphList] = useState(null)

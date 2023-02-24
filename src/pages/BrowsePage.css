@@ -1,0 +1,21 @@
+#filters {
+    width: 100vw;
+    padding: 0.5em 1em;
+    border-bottom: solid 2px black;
+}
+
+#graph-list {
+    display: flex;
+    gap: 1em;
+    justify-content: space-around;
+    flex-wrap: wrap;
+}
+
+.graph {
+    width: 7em;
+    text-align: center;
+}
+
+.graph img {
+    width: 100%;
+}
