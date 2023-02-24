@@ -1,0 +1,229 @@
+{
+    "name": "Prim's Algorithm",
+    "options": {
+        "type": "mixed",
+        "multi": false,
+        "allowSelfLoops": true
+    },
+    "attributes": {},
+    "code": "// An implementation of Prim's algorithm to find the minimum spanning tree of a graph\n// Red edges are edges that are part of the minimum spanning tree\n// Orange nodes are nodes that are part of the minimum spanning tree\n\nlet nodes = graph.nodes()\nlet start_node = nodes[Math.floor(Math.random() * nodes.length)]\n\n// Color the starting node\ngraph.setNodeAttribute(start_node, \"color\", \"orange\")\n\nlet visited_nodes = new Set()\nvisited_nodes.add(start_node)\nlet minimum_spanning_tree = []\n\n// A minimum spanning tree has 1 less edge as it has nodes\nfor(let i = 0; i < nodes.length - 1; i++) {\n    \n    // Get all edges that connect a visited node to a\n    // node that has not yet been visited\n    let edges = graph.filterEdges((edge, attr, src, target) => (\n        (visited_nodes.has(src) && !visited_nodes.has(target)) ||\n        (visited_nodes.has(target) && !visited_nodes.has(src))\n    ))\n    \n    // Get the smallest edge\n    let smallest_edge;\n    let smallest_edge_size = Infinity\n    for(let edge of edges) {\n        let edge_size = Number(graph.getEdgeAttribute(edge, \"label\"))\n        if( edge_size < smallest_edge_size) {\n            smallest_edge_size = edge_size\n            smallest_edge = edge\n        }\n    }\n    \n    console.log(\"Smallest edge has size: \" + String(smallest_edge_size))\n    \n    // Add the edge to the spanning tree\n    minimum_spanning_tree.push(smallest_edge)\n    // Color the edge\n    groupHistory()\n    graph.setEdgeAttribute(smallest_edge, \"color\", \"red\")\n    // Mark the ends of the edge as visited\n    visited_nodes.add(graph.source(smallest_edge))\n    visited_nodes.add(graph.target(smallest_edge))\n    // Color the ends of the edge\n    graph.setNodeAttribute(graph.source(smallest_edge), \"color\", \"orange\")\n    graph.setNodeAttribute(graph.target(smallest_edge), \"color\", \"orange\")\n    finishHistoryGroup()\n}\n\nconsole.log(minimum_spanning_tree)",
+    "nodes": [
+        {
+            "key": "0",
+            "attributes": {
+                "x": 0.1,
+                "y": 0.1,
+                "color": "#000",
+                "highlighted": false,
+                "size": 6
+            }
+        },
+        {
+            "key": "1",
+            "attributes": {
+                "x": 0.9,
+                "y": 0.1,
+                "color": "#000",
+                "highlighted": false,
+                "size": 6
+            }
+        },
+        {
+            "key": "2",
+            "attributes": {
+                "x": 0.1,
+                "y": 0.9,
+                "color": "#000",
+                "highlighted": false,
+                "size": 6
+            }
+        },
+        {
+            "key": "3",
+            "attributes": {
+                "x": 0.9,
+                "y": 0.5,
+                "color": "#000",
+                "highlighted": false,
+                "size": 6
+            }
+        },
+        {
+            "key": "4",
+            "attributes": {
+                "x": 0.9,
+                "y": 0.9,
+                "color": "#000",
+                "size": 6,
+                "highlighted": false
+            }
+        },
+        {
+            "key": "5",
+            "attributes": {
+                "x": -0.3,
+                "y": 0.5,
+                "color": "#000",
+                "size": 6,
+                "highlighted": false
+            }
+        },
+        {
+            "key": "6",
+            "attributes": {
+                "x": 1.4,
+                "y": 0.9,
+                "color": "#000",
+                "size": 6
+            }
+        },
+        {
+            "key": "7",
+            "attributes": {
+                "x": 1.4,
+                "y": 0.1,
+                "color": "#000",
+                "size": 6,
+                "highlighted": false
+            }
+        },
+        {
+            "key": "8",
+            "attributes": {
+                "x": 1.8,
+                "y": 0.5,
+                "color": "#000",
+                "size": 6,
+                "highlighted": false
+            }
+        }
+    ],
+    "edges": [
+        {
+            "key": "geid_56_0",
+            "source": "0",
+            "target": "1",
+            "attributes": {
+                "label": "1",
+                "size": 4
+            }
+        },
+        {
+            "key": "geid_56_3",
+            "source": "3",
+            "target": "0",
+            "attributes": {
+                "label": "7",
+                "size": 4
+            }
+        },
+        {
+            "key": "geid_56_4",
+            "source": "0",
+            "target": "2",
+            "attributes": {
+                "label": "11",
+                "size": 4
+            }
+        },
+        {
+            "key": "geid_56_5",
+            "source": "1",
+            "target": "3",
+            "attributes": {
+                "label": "6",
+                "size": 4
+            }
+        },
+        {
+            "key": "geid_170_0",
+            "source": "4",
+            "target": "2",
+            "attributes": {
+                "size": 4,
+                "label": "8"
+            }
+        },
+        {
+            "key": "geid_170_1",
+            "source": "4",
+            "target": "3",
+            "attributes": {
+                "size": 4,
+                "label": "2"
+            }
+        },
+        {
+            "key": "geid_170_2",
+            "source": "5",
+            "target": "2",
+            "attributes": {
+                "size": 4,
+                "label": "4"
+            }
+        },
+        {
+            "key": "geid_170_3",
+            "source": "5",
+            "target": "0",
+            "attributes": {
+                "size": 4,
+                "label": "8"
+            }
+        },
+        {
+            "key": "geid_170_4",
+            "source": "6",
+            "target": "4",
+            "attributes": {
+                "size": 4,
+                "label": "7"
+            }
+        },
+        {
+            "key": "geid_170_5",
+            "source": "7",
+            "target": "1",
+            "attributes": {
+                "size": 4,
+                "label": "2"
+            }
+        },
+        {
+            "key": "geid_170_6",
+            "source": "7",
+            "target": "4",
+            "attributes": {
+                "size": 4,
+                "label": "4"
+            }
+        },
+        {
+            "key": "geid_170_7",
+            "source": "7",
+            "target": "6",
+            "attributes": {
+                "size": 4,
+                "label": "14"
+            }
+        },
+        {
+            "key": "geid_170_8",
+            "source": "8",
+            "target": "6",
+            "attributes": {
+                "size": 4,
+                "label": "9"
+            }
+        },
+        {
+            "key": "geid_170_9",
+            "source": "8",
+            "target": "7",
+            "attributes": {
+                "size": 4,
+                "label": "10"
+            }
+        }
+    ]
+}
