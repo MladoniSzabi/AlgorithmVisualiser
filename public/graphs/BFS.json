@@ -6,14 +6,14 @@
         "allowSelfLoops": false
     },
     "attributes": {},
-    "code": "",
+    "code": "let queue = []\nlet root_node = graph.filterNodes((node, attr) => (attr.color == \"green\"))[0]\ngraph.setNodeAttribute(root_node, \"parent\", \"-1\")\nqueue.push(root_node)\n\nlet prev_node = null\nwhile(queue.length) {\n    let curr_node = queue.shift()\n    groupHistory()\n    if(prev_node) {\n        graph.setNodeAttribute(prev_node, \"color\", \"grey\")\n    }\n    prev_node = curr_node\n    graph.setNodeAttribute(curr_node, \"color\", \"green\")\n    finishHistoryGroup()\n    \n    let parent = graph.getNodeAttribute(curr_node, \"parent\")\n    let children = graph.neighbors(curr_node).filter((e) => e!==parent)\n    for(let child of children) {\n        graph.mergeNodeAttributes(child, {\"color\": \"yellow\", \"parent\": curr_node})\n        queue.push(child)\n    }\n}",
     "nodes": [
         {
             "key": "2",
             "attributes": {
                 "x": 0.5,
                 "y": 0.8,
-                "color": "#000",
+                "color": "green",
                 "highlighted": false,
                 "size": 6
             }

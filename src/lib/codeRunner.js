@@ -79,11 +79,13 @@ export default class CodeRunner {
             func(graph, groupHistory, finishHistoryGroup)
         } catch (error) {
             this.output.push(error.toString())
+            throw error
         } finally {
             // Restore console object so it works as expected
             console.log = consoleBackup.log
             console.warn = consoleBackup.warn
             console.error = consoleBackup.error
+            this.history.push({ graph: this.graph, output: this.output.slice() })
 
             return this.history
         }
