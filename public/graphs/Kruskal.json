@@ -1,0 +1,243 @@
+{
+    "name": "Kruskal's Algorithm",
+    "options": {
+        "type": "mixed",
+        "multi": false,
+        "allowSelfLoops": true
+    },
+    "attributes": {},
+    "code": "// An implementation of Kruskal's algorithm to find the minimum spanning tree of a graph\n// Red edges are edges that are part of the minimum spanning tree\n// Orange nodes are nodes that are part of the minimum spanning tree\n\n// The Union Find algorithm is used to detect wheter adding the edge would create a cycle\n// Check out the page on Union Find\nclass UnionFind {\n    constructor(vertices) {\n        this.vertices = {}\n        this.sizes = {}\n        for(let vertex of vertices) {\n            this.vertices[vertex] = vertex\n            this.sizes[vertex] = 1\n        }\n    }\n    \n    union(tree1, tree2) {\n        if(this.sizes[tree2] > this.sizes[tree1]) {\n            return this.union(tree2, tree1)\n        }\n        \n        this.vertices[tree2] = tree1\n        this.sizes[tree1] += this.sizes[tree2]\n    }\n    \n    find(vertex) {\n        while(vertex != this.vertices[vertex]) {\n            this.vertices[vertex] = this.vertices[this.vertices[vertex]]\n            vertex = this.vertices[vertex]\n        }\n        return vertex\n    }\n}\n\nlet result = []\n// Initialise union find\nlet union_find = new UnionFind(graph.nodes())\n\n// Sort edges\nlet edges = graph.mapEdges(\n    (edge, attributes, source, target) => ({\n        edge,\n        weight: attributes.weight,\n        source,\n        target\n    })\n)\nedges.sort((edge1, edge2) => (edge1.weight > edge2.weight))\n\nedges.forEach(({edge, weight, source, target}) => {\n    groupHistory()\n    // Check if adding this edge would create a loop\n    let source_set = union_find.find(source)\n    let target_set = union_find.find(target)\n    \n    if(source_set == target_set) {\n        // Adding this edge would create a cycle\n        // Skip\n        console.log(\"Skipping edge \" + String(edge) + \" of weight \" + String(weight))\n        finishHistoryGroup()\n        return\n    }\n    \n    console.log(\"Adding edge \" + String(edge) + \" of weight \" + String(weight))\n    graph.setNodeAttribute(source, \"color\", \"orange\")\n    graph.setNodeAttribute(target, \"color\", \"orange\")\n    graph.setEdgeAttribute(edge, \"color\", \"red\")\n    \n    // Update union find\n    union_find.union(source_set, target_set)\n    result.push(edge)\n    finishHistoryGroup()\n})\n\nconsole.log(result)\n",
+    "nodes": [
+        {
+            "key": "0",
+            "attributes": {
+                "x": 0.1,
+                "y": 0.1,
+                "color": "#000",
+                "highlighted": false,
+                "size": 6
+            }
+        },
+        {
+            "key": "1",
+            "attributes": {
+                "x": 0.9,
+                "y": 0.1,
+                "color": "#000",
+                "highlighted": false,
+                "size": 6
+            }
+        },
+        {
+            "key": "2",
+            "attributes": {
+                "x": 0.1,
+                "y": 0.9,
+                "color": "#000",
+                "highlighted": false,
+                "size": 6
+            }
+        },
+        {
+            "key": "3",
+            "attributes": {
+                "x": 0.9,
+                "y": 0.5,
+                "color": "#000",
+                "highlighted": false,
+                "size": 6
+            }
+        },
+        {
+            "key": "4",
+            "attributes": {
+                "x": 0.9,
+                "y": 0.9,
+                "color": "#000",
+                "size": 6,
+                "highlighted": false
+            }
+        },
+        {
+            "key": "5",
+            "attributes": {
+                "x": -0.3,
+                "y": 0.5,
+                "color": "#000",
+                "size": 6,
+                "highlighted": false
+            }
+        },
+        {
+            "key": "6",
+            "attributes": {
+                "x": 1.4,
+                "y": 0.9,
+                "color": "#000",
+                "size": 6
+            }
+        },
+        {
+            "key": "7",
+            "attributes": {
+                "x": 1.4,
+                "y": 0.1,
+                "color": "#000",
+                "size": 6,
+                "highlighted": false
+            }
+        },
+        {
+            "key": "8",
+            "attributes": {
+                "x": 1.8,
+                "y": 0.5,
+                "color": "#000",
+                "size": 6,
+                "highlighted": false
+            }
+        }
+    ],
+    "edges": [
+        {
+            "key": "geid_56_0",
+            "source": "0",
+            "target": "1",
+            "attributes": {
+                "weight": 1,
+                "label": "1",
+                "size": 4
+            }
+        },
+        {
+            "key": "geid_56_3",
+            "source": "3",
+            "target": "0",
+            "attributes": {
+                "weight": 7,
+                "label": "7",
+                "size": 4
+            }
+        },
+        {
+            "key": "geid_56_4",
+            "source": "0",
+            "target": "2",
+            "attributes": {
+                "weight": 11,
+                "label": "11",
+                "size": 4
+            }
+        },
+        {
+            "key": "geid_56_5",
+            "source": "1",
+            "target": "3",
+            "attributes": {
+                "weight": 6,
+                "label": "6",
+                "size": 4
+            }
+        },
+        {
+            "key": "geid_170_0",
+            "source": "4",
+            "target": "2",
+            "attributes": {
+                "size": 4,
+                "weight": 8,
+                "label": "8"
+            }
+        },
+        {
+            "key": "geid_170_1",
+            "source": "4",
+            "target": "3",
+            "attributes": {
+                "size": 4,
+                "weight": 2,
+                "label": "2"
+            }
+        },
+        {
+            "key": "geid_170_2",
+            "source": "5",
+            "target": "2",
+            "attributes": {
+                "size": 4,
+                "weight": 4,
+                "label": "4"
+            }
+        },
+        {
+            "key": "geid_170_3",
+            "source": "5",
+            "target": "0",
+            "attributes": {
+                "size": 4,
+                "weight": 8,
+                "label": "8"
+            }
+        },
+        {
+            "key": "geid_170_4",
+            "source": "6",
+            "target": "4",
+            "attributes": {
+                "size": 4,
+                "weight": 7,
+                "label": "7"
+            }
+        },
+        {
+            "key": "geid_170_5",
+            "source": "7",
+            "target": "1",
+            "attributes": {
+                "size": 4,
+                "weight": 2,
+                "label": "2"
+            }
+        },
+        {
+            "key": "geid_170_6",
+            "source": "7",
+            "target": "4",
+            "attributes": {
+                "size": 4,
+                "weight": 4,
+                "label": "4"
+            }
+        },
+        {
+            "key": "geid_170_7",
+            "source": "7",
+            "target": "6",
+            "attributes": {
+                "size": 4,
+                "weight": 14,
+                "label": "14"
+            }
+        },
+        {
+            "key": "geid_170_8",
+            "source": "8",
+            "target": "6",
+            "attributes": {
+                "size": 4,
+                "weight": 9,
+                "label": "9"
+            }
+        },
+        {
+            "key": "geid_170_9",
+            "source": "8",
+            "target": "7",
+            "attributes": {
+                "size": 4,
+                "weight": 10,
+                "label": "10"
+            }
+        }
+    ]
+}
