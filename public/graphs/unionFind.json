@@ -1,0 +1,144 @@
+{
+    "name": "Union Find",
+    "options": {
+        "type": "mixed",
+        "multi": false,
+        "allowSelfLoops": true
+    },
+    "attributes": {},
+    "code": "// Union Find is an algorithm to detect if a graph contains a cycle or if two edges are connected\n// The algorithm uses a data structure that does the following two operations: \n// 1. Compute the union of two sets\n// 2. Find which set an item belongs to\n\n// *First implementation*\n// We will use union find to detect if a graph is cyclic\n// We will start with an array of sets that each contain a single vertex of our graph.\n// A set in this case will represent a collection of vertices that we know are connected.\n//\n// For each edge of the graph, we will find which set the end vertices are contained in.\n// If they are contained in the same set, that means we are adding an edge to vertices\n// that are connected, thus creating a cycle.\n// In this case we are finished with the algorithm and can return that we found a cycle\n//\n// If the end vertices are part of different sets, we now know that there is a connection\n// between the vertices in these sets, so we can put them all in one big set.\n\nfunction run_implementation_1() {\n    \n    class UnionFind {\n        constructor(initial_sets) {\n            this.sets = initial_sets\n        }\n        \n        // Computes the union of the two sets\n        // Optionally also sets each vertices color to be the same\n        union(set1, set2, new_color = null) {\n            \n            groupHistory()\n            if(new_color) {\n                for(let vertex of this.sets[set2]) {\n                    graph.setNodeAttribute(vertex, \"color\", new_color)\n                }\n            }\n            \n            // Create one big set will the elements of both sets\n            this.sets[set1] = new Set([...this.sets[set1], ...this.sets[set2]])\n            // Delete the second set since we don't need it anymore\n            delete sets[set2]\n            this.debug_print()\n            finishHistoryGroup()\n        }\n        \n        find(vertex) {\n            for(let i = 0; i < this.sets.length; i++) {\n                if(this.sets[i] && this.sets[i].has(vertex)) {\n                    return i\n                }\n            }\n            \n            throw \"Vertex not found\"\n        }\n        \n        debug_print() {\n            let result = \"[ \"\n            for(let current_set of this.sets) {\n                if(!current_set) {\n                    continue\n                }\n                result += \"{\"\n                for(let element of current_set) {\n                    result += \" \" + String(element)\n                }\n                result += \" } \"\n            }\n            result += \"]\"\n            console.log(result)\n        }\n    }\n    \n    // Create an array of sets\n    // Each set contains a single vertex from the graph\n    let sets = graph.mapNodes((node, attr) => new Set([node]))\n    let union_find = new UnionFind(sets)\n    \n    let did_find_cycle = false\n    for(let edge of graph.edges()) {\n        let source_set = union_find.find(graph.source(edge))\n        let target_set = union_find.find(graph.target(edge))\n        \n        if(source_set == target_set) {\n            did_find_cycle = true\n            break\n        }\n        \n        let vertex_color = graph.getNodeAttribute(graph.source(edge), \"color\")\n        union_find.union(source_set, target_set, vertex_color)\n    }\n    \n    if(did_find_cycle) {\n        console.log(\"We found a cycle! The graph is cyclic.\")\n    } else {\n        console.log(\"This graph is not cyclic.\")\n    }\n}\n\n// *Second Implementation*\n// The algorithm is the same as the first one but instead of storing sets,\n// we store trees.\n// We will store a map (JS Object) that maps each vertex to another vertex that is closer to the\n// root node of the tree and make each root node map to itself.\n// Two vertices belong to the same tree if they both have the same root node\n// To check which tree a vertex belongs to, we will keep using the map to get closer\n// and closer to the root until we find it.\n// To compute the union of two trees, we will set one of the root nodes of the trees to map\n// to the root node of the other tree.\n// Optimisation 1: Each time we have to go one level up using the map, we will,\n// update the current vertex to point to the vertex above its parent so next time we will\n// have to iterate one less time\n// Optimisation 2: To reduce the number iterations we need to find a root node,\n// we will store the size of each set, and merge the smaller set into the bigger set\n// so that fewer updates are needed\n//\n// In the graph, each node will have a color and a label.\n// The label represents the color of the vertex that it maps to\n\nfunction run_implementation_2() {\n    class UnionFind {\n        constructor(vertices) {\n            // Initialise the size of each set \n            this.vertices = {}\n            this.sizes = {}\n            groupHistory()\n            for(let vertex of vertices) {\n                // We don't know how the vertices are connected so each one is its own tree\n                this.vertices[vertex] = vertex\n                this.sizes[vertex] = 1\n                let color = graph.getNodeAttribute(vertex, \"color\")\n                graph.setNodeAttribute(vertex, \"label\", color)\n            }\n            this.debug_print()\n            finishHistoryGroup()\n        }\n        \n        // Computes the union of the two trees\n        union(tree1, tree2) {\n            \n            // Makes sure the first tree is bigger than the second one\n            // so that we always add the smaller tree to the bigger tree\n            if(this.sizes[tree2] > this.sizes[tree1]) {\n                return this.union(tree2, tree1)\n            }\n            \n            // Merge the trees\n            this.vertices[tree2] = tree1\n            // Update the size of the new tree\n            this.sizes[tree1] += this.sizes[tree2]\n            delete this.sizes[tree2]\n            \n            let set1_color = graph.getNodeAttribute(tree1, \"color\")\n            graph.setNodeAttribute(tree2, \"label\", set1_color)\n        }\n        \n        find(vertex) {\n            while(vertex != this.vertices[vertex]) {\n                // Update the map so that next time we have to iterate one less time\n                let color = graph.getNodeAttribute(this.vertices[vertex], \"label\")\n                graph.setNodeAttribute(vertex, \"label\", color)\n                this.vertices[vertex] = this.vertices[this.vertices[vertex]]\n                // Move up the tree\n                vertex = this.vertices[vertex]\n            }\n            return vertex\n        }\n        \n        debug_print() {\n            console.log(\"Vertices: \", this.vertices)\n            console.log(\"Sizes: \", this.sizes)\n        }\n    }\n    \n    \n    let union_find = new UnionFind(graph.nodes())\n    \n    let did_find_cycle = false\n    for(let edge of graph.edges()) {\n        let source_set = union_find.find(graph.source(edge))\n        let target_set = union_find.find(graph.target(edge))\n        \n        if(source_set == target_set) {\n            did_find_cycle = true\n            break\n        }\n        \n        groupHistory()\n        union_find.union(source_set, target_set)\n        union_find.debug_print()\n        finishHistoryGroup()\n    }\n    \n    if(did_find_cycle) {\n        console.log(\"We found a cycle! The graph is cyclic.\")\n    } else {\n        console.log(\"This graph is not cyclic.\")\n    }\n}\n\nrun_implementation_1()\n// run_implementation_2()\n",
+    "nodes": [
+        {
+            "key": "0",
+            "attributes": {
+                "x": 0.35,
+                "y": 0.1,
+                "color": "green",
+                "highlighted": false,
+                "size": 6,
+                "label": ""
+            }
+        },
+        {
+            "key": "1",
+            "attributes": {
+                "x": 0.6,
+                "y": 0.5,
+                "color": "yellow",
+                "highlighted": false,
+                "size": 6
+            }
+        },
+        {
+            "key": "2",
+            "attributes": {
+                "x": 0.1,
+                "y": 0.9,
+                "color": "red",
+                "highlighted": false,
+                "size": 6
+            }
+        },
+        {
+            "key": "3",
+            "attributes": {
+                "x": 0.6,
+                "y": 0.9,
+                "color": "blue",
+                "highlighted": false,
+                "size": 6
+            }
+        },
+        {
+            "key": "4",
+            "attributes": {
+                "x": 0.1,
+                "y": 0.5,
+                "color": "black",
+                "size": 6,
+                "highlighted": false
+            }
+        },
+        {
+            "key": "5",
+            "attributes": {
+                "x": 0.85,
+                "y": 0.9,
+                "color": "purple",
+                "size": 6,
+                "highlighted": false
+            }
+        },
+        {
+            "key": "6",
+            "attributes": {
+                "x": 0.85,
+                "y": 0.5,
+                "color": "grey",
+                "size": 9,
+                "highlighted": false
+            }
+        }
+    ],
+    "edges": [
+        {
+            "key": "geid_56_0",
+            "source": "0",
+            "target": "1",
+            "attributes": {
+                "label": "",
+                "size": 4
+            }
+        },
+        {
+            "key": "geid_56_2",
+            "source": "2",
+            "target": "3",
+            "attributes": {
+                "label": "",
+                "size": 4
+            }
+        },
+        {
+            "key": "geid_56_5",
+            "source": "1",
+            "target": "3",
+            "attributes": {
+                "label": "",
+                "size": 4
+            }
+        },
+        {
+            "key": "geid_132_1",
+            "source": "2",
+            "target": "4",
+            "attributes": {
+                "size": 4
+            }
+        },
+        {
+            "key": "geid_132_2",
+            "source": "5",
+            "target": "3",
+            "attributes": {
+                "size": 4
+            }
+        },
+        {
+            "key": "geid_132_3",
+            "source": "6",
+            "target": "5",
+            "attributes": {
+                "size": 4
+            }
+        },
+        {
+            "key": "geid_197_0",
+            "source": "0",
+            "target": "4",
+            "attributes": {
+                "size": 4
+            }
+        }
+    ]
+}
