@@ -17,12 +17,13 @@ const EDGE_DEFAULT_SIZE = 4
 let keyDownCallback = null
 
 class GraphComponent extends Component {
-    constructor({ setGraph }) {
+    constructor({ onGraphChanged }) {
         super()
         this.state = {
             selectedNode: null,
             selectedEdge: null
         }
+        this.onGraphChanged = onGraphChanged
         this.sigma = createRef(null)
         this.hoveredNode = null
         this.hoveredEdge = null
@@ -30,7 +31,6 @@ class GraphComponent extends Component {
         this.wasNodeDragged = false
         this.mouseX = 0
         this.mouseY = 0
-        this.setParentGraph = setGraph
         this.keydown = this.keydown.bind(this)
         this.render = this.render.bind(this)
         this.onAttributeChange = this.onAttributeChange.bind(this)
@@ -174,6 +174,7 @@ class GraphComponent extends Component {
 
         const node = this.sigma.current.getGraph().addNode(this.newNodeIndex++, { x: position.x, y: position.y, color: "#000", size: NODE_DEFAULT_SIZE })
         this.selectNode(node)
+        this.onGraphChanged()
     }
 
     selectEdge(edge) {
@@ -214,6 +215,7 @@ class GraphComponent extends Component {
         }
 
         this.sigma.current.getGraph().addEdge(this.state.selectedNode, this.hoveredNode)
+        this.onGraphChanged()
     }
 
     deleteNode() {
@@ -225,6 +227,7 @@ class GraphComponent extends Component {
         if (confirmDelete) {
             this.sigma.current.getGraph().dropNode(this.state.selectedNode)
             this.setState({ selectedNode: null })
+            this.onGraphChanged()
         }
     }
 
@@ -237,6 +240,7 @@ class GraphComponent extends Component {
         if (confirmDelete) {
             this.sigma.current.getGraph().dropEdge(this.state.selectedEdge)
             this.setState({ selectedEdge: null })
+            this.onGraphChanged()
         }
     }
 
@@ -250,6 +254,7 @@ class GraphComponent extends Component {
 
         y += this.sigma.current.getGraph().getNodeAttribute(this.state.selectedNode, "y")
         this.sigma.current.getGraph().setNodeAttribute(this.state.selectedNode, "y", y)
+        this.onGraphChanged()
     }
 
     keydown(event) {
@@ -302,6 +307,7 @@ class GraphComponent extends Component {
             this.sigma.current.getGraph().setNodeAttribute(this.draggedNode, "x", pos.x)
             this.sigma.current.getGraph().setNodeAttribute(this.draggedNode, "y", pos.y)
             this.preventDefault(event)
+            this.onGraphChanged()
         }
     }
 
@@ -315,6 +321,7 @@ class GraphComponent extends Component {
         else
             this.sigma.current.getGraph().setEdgeAttribute(this.state.selectedEdge, key, event.target.value)
         this.forceUpdate()
+        this.onGraphChanged()
     }
 
     addNewAttribute() {
@@ -328,6 +335,7 @@ class GraphComponent extends Component {
         else
             this.sigma.current.getGraph().setEdgeAttribute(this.state.selectedEdge, newAttribute, "")
         this.forceUpdate()
+        this.onGraphChanged()
     }
 
     render() {

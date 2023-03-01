@@ -1,5 +1,5 @@
 import React, { Component, createRef } from "react";
-import { Link, useLocation, useNavigate, useParams } from "react-router-dom"
+import { Link, useLocation, useNavigate, useParams, useBeforeUnload } from "react-router-dom"
 
 import './AlgorithmPage.css'
 import GraphComponent from "component/GraphComponent";
@@ -31,7 +31,7 @@ class AlgorithmPage extends Component {
             graph: null,
             code: "",
             history: [],
-            historyIndex: -1
+            historyIndex: -1,
         }
 
         this.onRunCode = this.onRunCode.bind(this)
@@ -42,11 +42,32 @@ class AlgorithmPage extends Component {
         this.onKeyDown = this.onKeyDown.bind(this)
         this.onCodeChange = this.onCodeChange.bind(this)
         this.resetHistory = this.resetHistory.bind(this)
+        this.onBeforeUnload = this.onBeforeUnload.bind(this)
+        this.onGraphChanged = this.onGraphChanged.bind(this)
+        this.onGoingToBrowse = this.onGoingToBrowse.bind(this)
 
         this.graphComponentRef = createRef()
+
+        this.didChange = false
+    }
+
+    onGoingToBrowse() {
+
+    }
+
+    onGraphChanged() {
+        this.markAsChanged()
+    }
+
+    markAsChanged() {
+        if (!this.didChange) {
+            this.didChange = true
+            document.title = "*" + document.title
+        }
     }
 
     onCodeChange(code) {
+        this.markAsChanged()
         this.setState({ code })
     }
 
@@ -66,9 +87,22 @@ class AlgorithmPage extends Component {
         }
     }
 
+    onBeforeUnload(event) {
+        if (!this.didChange) {
+            return undefined
+        }
+
+        let confirmationMessage = 'It looks like you have been editing something. If you leave before saving, your changes will be lost.';
+
+        (event || window.event).returnValue = confirmationMessage
+        return confirmationMessage
+    }
+
     componentDidMount() {
         this.fetchGraph()
         document.addEventListener("keydown", this.onKeyDown)
+        window.addEventListener("beforeunload", this.onBeforeUnload)
+        document.title = this.props.router.params.algorithmName
     }
 
     async fetchGraph() {
@@ -123,11 +157,11 @@ class AlgorithmPage extends Component {
         return (
             <div id="algorithm">
                 <div id="algorithm_name">
-                    <Link to="/">
-                        <span class="material-symbols-outlined">
+                    <a href="/" >
+                        <span className="material-symbols-outlined">
                             arrow_back
                         </span>
-                    </Link>
+                    </a>
                     <h1>{this.props.router.params.algorithmName}</h1>
                 </div>
                 <div id="code-editor">
@@ -143,7 +177,7 @@ class AlgorithmPage extends Component {
                     }
                 </div>
                 <div id="graph-visualisation">
-                    {graph && <GraphComponent isInteractive={isInteractive} ref={this.graphComponentRef} graph={graph}></GraphComponent>}
+                    {graph && <GraphComponent onGraphChanged={this.onGraphChanged} isInteractive={isInteractive} ref={this.graphComponentRef} graph={graph}></GraphComponent>}
                     {this.state.historyIndex !== -1 && <button id="reset-history" onClick={this.resetHistory}><img src="reset.svg" alt="reset" /></button>}
                 </div>
                 <div id="code-output">{output.map((el, index) => <p key={index}>{el}</p>)}</div>
