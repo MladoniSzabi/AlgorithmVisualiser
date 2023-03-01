@@ -86,7 +86,6 @@ export default class CodeRunner {
             console.warn = consoleBackup.warn
             console.error = consoleBackup.error
             this.history[this.history.length - 1].output = this.output.slice()
-            this.history.push({ graph: this.graph, output: this.output.slice() })
 
             return this.history
         }
