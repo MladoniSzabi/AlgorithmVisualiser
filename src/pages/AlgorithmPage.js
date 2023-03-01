@@ -1,5 +1,5 @@
 import React, { Component, createRef } from "react";
-import { useLocation, useNavigate, useParams } from "react-router-dom"
+import { Link, useLocation, useNavigate, useParams } from "react-router-dom"
 
 import './AlgorithmPage.css'
 import GraphComponent from "component/GraphComponent";
@@ -122,7 +122,14 @@ class AlgorithmPage extends Component {
         }
         return (
             <div id="algorithm">
-                <div id="algorithm_name"><h1>{this.props.router.params.algorithmName}</h1></div>
+                <div id="algorithm_name">
+                    <Link to="/">
+                        <span class="material-symbols-outlined">
+                            arrow_back
+                        </span>
+                    </Link>
+                    <h1>{this.props.router.params.algorithmName}</h1>
+                </div>
                 <div id="code-editor">
                     <CodeEditorComponent onCodeChange={this.onCodeChange} savedCode={this.state.code} onRunCode={this.onRunCode}></CodeEditorComponent>
                 </div>

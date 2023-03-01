@@ -45,10 +45,23 @@
 }
 
 #algorithm_name {
-    text-align: center;
     grid-area: header;
-    color: #80a1bd;
     border-bottom: 2px solid #555;
+    display: flex;
+}
+
+#algorithm_name a {
+    margin: auto;
+}
+
+#algorithm_name a span {
+    font-size: 3em;
+}
+
+#algorithm_name h1 {
+    text-align: center;
+    color: #80a1bd;
+    flex-grow: 1;
 }
 
 #code-editor {
