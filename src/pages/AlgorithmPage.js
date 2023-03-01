@@ -41,6 +41,7 @@ class AlgorithmPage extends Component {
         this.onHistoryBack = this.onHistoryBack.bind(this)
         this.onKeyDown = this.onKeyDown.bind(this)
         this.onCodeChange = this.onCodeChange.bind(this)
+        this.resetHistory = this.resetHistory.bind(this)
 
         this.graphComponentRef = createRef()
     }
@@ -103,6 +104,13 @@ class AlgorithmPage extends Component {
         })
     }
 
+    resetHistory() {
+        this.setState({
+            history: [],
+            historyIndex: -1
+        })
+    }
+
     render() {
         let graph = this.state.graph
         let isInteractive = true
@@ -129,6 +137,7 @@ class AlgorithmPage extends Component {
                 </div>
                 <div id="graph-visualisation">
                     {graph && <GraphComponent isInteractive={isInteractive} ref={this.graphComponentRef} graph={graph}></GraphComponent>}
+                    {this.state.historyIndex !== -1 && <button id="reset-history" onClick={this.resetHistory}><img src="reset.svg" alt="reset" /></button>}
                 </div>
                 <div id="code-output">{output.map((el, index) => <p key={index}>{el}</p>)}</div>
             </div>

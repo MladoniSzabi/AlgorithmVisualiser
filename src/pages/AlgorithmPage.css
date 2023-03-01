@@ -60,6 +60,7 @@
     grid-area: graph;
     border-left: 2px solid #555;
     padding: 0.5em;
+    position: relative;
 }
 
 #code-output {
@@ -86,4 +87,9 @@
 
 .ace_breakpoint {
     transform: translate(-10px);
+}
+
+#reset-history {
+    position: absolute;
+    top: 0.5em;
 }
