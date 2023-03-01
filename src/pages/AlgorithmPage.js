@@ -105,8 +105,10 @@ class AlgorithmPage extends Component {
 
     render() {
         let graph = this.state.graph
+        let isInteractive = true
         let output = []
         if (this.state.historyIndex !== -1) {
+            isInteractive = false
             graph = this.state.history[this.state.historyIndex].graph
             output = this.state.history[this.state.historyIndex].output
         }
@@ -126,7 +128,7 @@ class AlgorithmPage extends Component {
                     }
                 </div>
                 <div id="graph-visualisation">
-                    {graph && <GraphComponent ref={this.graphComponentRef} graph={graph}></GraphComponent>}
+                    {graph && <GraphComponent isInteractive={isInteractive} ref={this.graphComponentRef} graph={graph}></GraphComponent>}
                 </div>
                 <div id="code-output">{output.map((el, index) => <p key={index}>{el}</p>)}</div>
             </div>

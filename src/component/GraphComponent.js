@@ -168,6 +168,10 @@ class GraphComponent extends Component {
     }
 
     addNode(position) {
+        if (!this.props.isInteractive) {
+            return
+        }
+
         const node = this.sigma.current.getGraph().addNode(this.newNodeIndex++, { x: position.x, y: position.y, color: "#000", size: NODE_DEFAULT_SIZE })
         this.selectNode(node)
     }
@@ -205,7 +209,7 @@ class GraphComponent extends Component {
     }
 
     addEdge() {
-        if (!this.selectNode || !this.hoveredNode) {
+        if (!this.selectNode || !this.hoveredNode || !this.props.isInteractive) {
             return
         }
 
@@ -213,6 +217,10 @@ class GraphComponent extends Component {
     }
 
     deleteNode() {
+        if (!this.props.isInteractive) {
+            return
+        }
+
         let confirmDelete = window.confirm("Are you sure you want to delete this node?")
         if (confirmDelete) {
             this.sigma.current.getGraph().dropNode(this.state.selectedNode)
@@ -221,6 +229,10 @@ class GraphComponent extends Component {
     }
 
     deleteEdge() {
+        if (!this.props.isInteractive) {
+            return
+        }
+
         let confirmDelete = window.confirm("Are you sure you want to delete this edge?")
         if (confirmDelete) {
             this.sigma.current.getGraph().dropEdge(this.state.selectedEdge)
@@ -229,7 +241,7 @@ class GraphComponent extends Component {
     }
 
     moveNode([x, y]) {
-        if (!this.state.selectedNode)
+        if (!this.state.selectedNode || !this.props.isInteractive)
             return
 
 
@@ -241,6 +253,11 @@ class GraphComponent extends Component {
     }
 
     keydown(event) {
+
+        if (!this.props.isInteractive) {
+            return
+        }
+
         if (event.key === 'a') {
             const pos = this.sigma.current.viewportToGraph({ x: this.mouseX, y: this.mouseY })
             this.addNode(pos)
@@ -276,6 +293,10 @@ class GraphComponent extends Component {
         this.mouseY = event.y
 
         if (this.draggedNode) {
+            if (!this.props.isInteractive) {
+                return
+            }
+
             this.wasNodeDragged = true
             const pos = this.sigma.current.viewportToGraph(event)
             this.sigma.current.getGraph().setNodeAttribute(this.draggedNode, "x", pos.x)
@@ -285,6 +306,10 @@ class GraphComponent extends Component {
     }
 
     onAttributeChange(key, event) {
+        if (!this.props.isInteractive) {
+            return
+        }
+
         if (this.state.selectedNode)
             this.sigma.current.getGraph().setNodeAttribute(this.state.selectedNode, key, event.target.value)
         else
@@ -293,6 +318,10 @@ class GraphComponent extends Component {
     }
 
     addNewAttribute() {
+        if (!this.props.isInteractive) {
+            return
+        }
+
         let newAttribute = prompt("Enter name of new attribute: ")
         if (this.state.selectedNode)
             this.sigma.current.getGraph().setNodeAttribute(this.state.selectedNode, newAttribute, "")
