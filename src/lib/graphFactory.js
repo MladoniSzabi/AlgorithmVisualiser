@@ -8,6 +8,14 @@ export async function graphFactory(graphName) {
         await getGraphList()
     }
 
+    let saved = localStorage.getItem(graphName)
+    if (saved) {
+        saved = JSON.parse(saved)
+        const graph = new Graph()
+        graph.import(saved.graph)
+        return [graph, saved.code]
+    }
+
     // It is a prebuilt graph
     if (graphName in graphs) {
         const graph = new Graph()

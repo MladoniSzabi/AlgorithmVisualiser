@@ -1,4 +1,4 @@
-import React, { Component } from "react";
+import React, { Component, createRef } from "react";
 import { useLocation, useNavigate, useParams } from "react-router-dom"
 
 import './AlgorithmPage.css'
@@ -36,18 +36,42 @@ class AlgorithmPage extends Component {
 
         this.onRunCode = this.onRunCode.bind(this)
         this.fetchGraph = this.fetchGraph.bind(this)
-        this.setGraph = this.setGraph.bind(this)
         this.onHistoryIndexChanged = this.onHistoryIndexChanged.bind(this)
         this.onHistoryForward = this.onHistoryForward.bind(this)
         this.onHistoryBack = this.onHistoryBack.bind(this)
+        this.onKeyDown = this.onKeyDown.bind(this)
+        this.onCodeChange = this.onCodeChange.bind(this)
 
+        this.graphComponentRef = createRef()
+    }
+
+    onCodeChange(code) {
+        this.setState({ code })
+    }
+
+    save() {
+        localStorage.setItem(this.props.router.params.algorithmName, JSON.stringify({
+            code: this.state.code,
+            graph: this.graphComponentRef.current.getGraph()
+        }))
+    }
+
+    onKeyDown(event) {
+        console.log(event.key)
+        if (event.key === "s" && event.ctrlKey && !event.altKey && !event.shiftKey) {
+            this.save()
+            event.preventDefault()
+            return false
+        }
     }
 
     componentDidMount() {
         this.fetchGraph()
+        document.addEventListener("keydown", this.onKeyDown)
     }
 
     async fetchGraph() {
+        console.log("fetching graph")
         const [graph, code] = await graphFactory(this.props.router.params.algorithmName)
         this.setState({ code, graph })
     }
@@ -57,11 +81,6 @@ class AlgorithmPage extends Component {
         let runner = new CodeRunner(code, this.state.graph)
         let history = runner.run()
         this.setState({ history, historyIndex: history.length - 1 })
-    }
-
-    setGraph(newGraph) {
-        // TODO: use historyIndex to set graph
-        this.setState({ graph: newGraph })
     }
 
     onHistoryIndexChanged(event) {
@@ -95,7 +114,7 @@ class AlgorithmPage extends Component {
             <div id="algorithm">
                 <div id="algorithm_name"><h1>{this.props.router.params.algorithmName}</h1></div>
                 <div id="code-editor">
-                    <CodeEditorComponent savedCode={this.state.code} onRunCode={this.onRunCode}></CodeEditorComponent>
+                    <CodeEditorComponent onCodeChange={this.onCodeChange} savedCode={this.state.code} onRunCode={this.onRunCode}></CodeEditorComponent>
                 </div>
                 <div id="history-slider">
                     {(this.state.history.length !== 0 && this.state.history.length !== 1) &&
@@ -107,7 +126,7 @@ class AlgorithmPage extends Component {
                     }
                 </div>
                 <div id="graph-visualisation">
-                    {graph && <GraphComponent setGraph={this.setGraph} graph={graph}></GraphComponent>}
+                    {graph && <GraphComponent ref={this.graphComponentRef} graph={graph}></GraphComponent>}
                 </div>
                 <div id="code-output">{output.map((el, index) => <p key={index}>{el}</p>)}</div>
             </div>

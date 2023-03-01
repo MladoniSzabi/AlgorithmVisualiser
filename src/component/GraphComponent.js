@@ -4,6 +4,7 @@ import { SigmaContainer, ControlsContainer } from "@react-sigma/core";
 import "@react-sigma/core/lib/react-sigma.min.css";
 import './GraphComponent.css'
 import drawEdgeLabel from "lib/sigmaJSEdgeLabelRenderer";
+import { Graph } from "graphology";
 
 const NODE_MOVE_AMOUNT = 0.01
 const NODE_MOVE_AMOUNT_SMALL = 0.001
@@ -34,21 +35,23 @@ class GraphComponent extends Component {
         this.render = this.render.bind(this)
         this.onAttributeChange = this.onAttributeChange.bind(this)
         this.addNewAttribute = this.addNewAttribute.bind(this)
-        this.setGraph = this.setGraph.bind(this)
     }
 
-    setGraph(graph) {
-        if (this.selectedNode) {
+    getGraph() {
+        if (this.state.selectedNode) {
             let size = this.sigma.current.getGraph().getNodeAttribute(this.state.selectedNode, "size")
-            this.sigma.current.getGraph().setNodeAttribute(this.selectedNode, "size", size / 1.5)
+            this.sigma.current.getGraph().setNodeAttribute(this.state.selectedNode, "size", size / 1.5)
         }
 
-        this.setParentGraph(graph)
+        let retval = new Graph()
+        retval.import(this.sigma.current.getGraph().export())
 
-        if (this.selectedNode) {
+        if (this.state.selectedNode) {
             let size = this.sigma.current.getGraph().getNodeAttribute(this.state.selectedNode, "size")
-            this.sigma.current.getGraph().setNodeAttribute(this.selectedNode, "size", size * 1.5)
+            this.sigma.current.getGraph().setNodeAttribute(this.state.selectedNode, "size", size * 1.5)
         }
+
+        return retval
     }
 
     componentDidUpdate(prevProps) {
@@ -152,7 +155,6 @@ class GraphComponent extends Component {
             if (this.wasNodeDragged) {
                 this.preventClick(event)
                 this.wasNodeDragged = false
-                this.setGraph(this.sigma.current.getGraph())
             }
         }
     }
@@ -167,7 +169,6 @@ class GraphComponent extends Component {
 
     addNode(position) {
         const node = this.sigma.current.getGraph().addNode(this.newNodeIndex++, { x: position.x, y: position.y, color: "#000", size: NODE_DEFAULT_SIZE })
-        this.setGraph(this.sigma.current.getGraph())
         this.selectNode(node)
     }
 
@@ -209,7 +210,6 @@ class GraphComponent extends Component {
         }
 
         this.sigma.current.getGraph().addEdge(this.state.selectedNode, this.hoveredNode)
-        this.setGraph(this.sigma.current.getGraph())
     }
 
     deleteNode() {
@@ -217,7 +217,6 @@ class GraphComponent extends Component {
         if (confirmDelete) {
             this.sigma.current.getGraph().dropNode(this.state.selectedNode)
             this.setState({ selectedNode: null })
-            this.setGraph(this.sigma.current.getGraph())
         }
     }
 
@@ -226,7 +225,6 @@ class GraphComponent extends Component {
         if (confirmDelete) {
             this.sigma.current.getGraph().dropEdge(this.state.selectedEdge)
             this.setState({ selectedEdge: null })
-            this.setGraph(this.sigma.current.getGraph())
         }
     }
 
@@ -240,8 +238,6 @@ class GraphComponent extends Component {
 
         y += this.sigma.current.getGraph().getNodeAttribute(this.state.selectedNode, "y")
         this.sigma.current.getGraph().setNodeAttribute(this.state.selectedNode, "y", y)
-
-        this.setGraph(this.sigma.current.getGraph())
     }
 
     keydown(event) {
@@ -293,7 +289,6 @@ class GraphComponent extends Component {
             this.sigma.current.getGraph().setNodeAttribute(this.state.selectedNode, key, event.target.value)
         else
             this.sigma.current.getGraph().setEdgeAttribute(this.state.selectedEdge, key, event.target.value)
-        this.setGraph(this.sigma.current.getGraph())
         this.forceUpdate()
     }
 
@@ -303,7 +298,6 @@ class GraphComponent extends Component {
             this.sigma.current.getGraph().setNodeAttribute(this.state.selectedNode, newAttribute, "")
         else
             this.sigma.current.getGraph().setEdgeAttribute(this.state.selectedEdge, newAttribute, "")
-        this.setGraph(this.sigma.current.getGraph())
         this.forceUpdate()
     }
 

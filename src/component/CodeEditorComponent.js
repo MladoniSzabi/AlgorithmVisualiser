@@ -3,7 +3,7 @@ import "ace-builds/src-noconflict/mode-javascript";
 import "ace-builds/src-noconflict/theme-tomorrow";
 import "ace-builds/src-noconflict/ext-language_tools";
 
-function CodeEditorComponent({ savedCode, onRunCode }) {
+function CodeEditorComponent({ savedCode, onRunCode, onCodeChange }) {
 
     function onRunTriggered(editor) {
         onRunCode(editor.getValue())
@@ -25,6 +25,7 @@ function CodeEditorComponent({ savedCode, onRunCode }) {
             bindKey: { win: "Ctrl-Return", mac: "Cmd-Return" },
             exec: onRunTriggered
         }]}
+        onChange={onCodeChange}
         setOptions={{
             enableBasicAutocompletion: true,
             enableLiveAutocompletion: true,
