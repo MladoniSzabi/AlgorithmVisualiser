@@ -1,5 +1,5 @@
 import React, { Component, createRef } from "react";
-import { Link, useLocation, useNavigate, useParams, useBeforeUnload } from "react-router-dom"
+import { useLocation, useNavigate, useParams } from "react-router-dom"
 
 import './AlgorithmPage.css'
 import GraphComponent from "component/GraphComponent";
@@ -72,10 +72,17 @@ class AlgorithmPage extends Component {
     }
 
     save() {
-        localStorage.setItem(this.props.router.params.algorithmName, JSON.stringify({
-            code: this.state.code,
-            graph: this.graphComponentRef.current.getGraph()
-        }))
+        if (this.didChange) {
+            localStorage.setItem(this.props.router.params.algorithmName, JSON.stringify({
+                code: this.state.code,
+                graph: this.graphComponentRef.current.getGraph()
+            }))
+
+            if (document.title[0] === "*") {
+                document.title = document.title.substring(1)
+            }
+            this.didChange = false
+        }
     }
 
     onKeyDown(event) {
