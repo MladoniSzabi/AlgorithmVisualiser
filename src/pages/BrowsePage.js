@@ -1,6 +1,5 @@
 import { getGraphList } from "lib/graphFactory"
 import { useEffect, useState } from "react"
-import { Link } from "react-router-dom"
 
 import "./BrowsePage.css"
 
@@ -22,9 +21,17 @@ function BrowsePage() {
 
     return (
         <>
-            <div id="filters">
-                <p><label htmlFor="alg-search">Search:</label> <input id="alg-search" type="search" value={searchBarText} list="algs-datalist" onChange={onSearchBarChange}></input></p>
-            </div>
+            <nav>
+                <div id="search-bar">
+                    <label htmlFor="alg-search">Search:</label>
+                    <input id="alg-search" type="search" value={searchBarText} list="algs-datalist" onChange={onSearchBarChange} />
+                </div>
+                <a href="/new-algorithm" id="new-algorithm" title="New Algorithm">
+                    <span className="material-symbols-outlined">
+                        add_circle
+                    </span>
+                </a>
+            </nav>
             <datalist id="algs-datalist">
                 {Object.entries(graphList).map(([key, value]) => <option value={key} key={key}>{key}</option>)}
             </datalist>

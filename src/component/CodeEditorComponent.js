@@ -6,7 +6,9 @@ import "ace-builds/src-noconflict/ext-language_tools";
 function CodeEditorComponent({ savedCode, onRunCode, onCodeChange }) {
 
     function onRunTriggered(editor) {
-        onRunCode(editor.getValue())
+        if (onRunCode) {
+            onRunCode(editor.getValue())
+        }
     }
 
     return <AceEditor

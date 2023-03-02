@@ -1,7 +1,9 @@
-#filters {
-    width: 100vw;
+nav {
+    width: calc(100vw - 2em);
     padding: 0.5em 1em;
     border-bottom: solid 2px black;
+    display: flex;
+    align-items: center;
 }
 
 #graph-list {
@@ -18,4 +20,12 @@
 
 .graph img {
     width: 100%;
+}
+
+#search-bar {
+    flex-grow: 1;
+}
+
+#new-algorithm span {
+    font-size: 2.5em;
 }
