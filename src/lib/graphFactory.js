@@ -19,7 +19,7 @@ export async function graphFactory(graphName) {
     // It is a prebuilt graph
     if (graphName in graphs) {
         const graph = new Graph()
-        const graphContent = await (await fetch(graphs[graphName])).json()
+        const graphContent = await (await fetch("/" + graphs[graphName])).json()
         graph.import(graphContent)
         return [graph, graphContent.code]
     }

@@ -11,7 +11,7 @@ const router = createBrowserRouter([
         errorElement: <ErrorPage></ErrorPage>
     },
     {
-        path: "/:algorithmName",
+        path: "algorithm/:algorithmName",
         element: <AlgorithmPage></AlgorithmPage>
     }
 ])

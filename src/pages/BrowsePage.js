@@ -33,7 +33,7 @@ function BrowsePage() {
                     Object.entries(graphList).filter(([key, value]) => (key.includes(searchBarText))).map(
                         ([key, value]) =>
                             <div key={key} className="graph">
-                                <a href={key}>
+                                <a href={"algorithm/" + key}>
                                     <img src="graph-icon.svg" alt={"graph-icon"}></img>
                                     <p>{key}</p>
                                 </a>
