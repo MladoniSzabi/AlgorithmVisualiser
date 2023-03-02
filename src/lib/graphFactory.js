@@ -4,16 +4,16 @@ let graphs = null
 
 export async function graphFactory(graphName) {
 
-    if (!graphs) {
-        await getGraphList()
-    }
-
     let saved = localStorage.getItem(graphName)
     if (saved) {
         saved = JSON.parse(saved)
         const graph = new Graph()
         graph.import(saved.graph)
         return [graph, saved.code]
+    }
+
+    if (!graphs) {
+        await getGraphList()
     }
 
     // It is a prebuilt graph
@@ -35,6 +35,12 @@ export async function getGraphList() {
 
     let response = await fetch("/graphs.json")
     graphs = await response.json()
+    for (let i = 0; i < localStorage.length; i++) {
+        let name = localStorage.key(i)
+        if (!(name in graphs)) {
+            graphs[name] = ""
+        }
+    }
 
     return graphs
 }
