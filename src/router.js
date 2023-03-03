@@ -4,6 +4,7 @@ import AlgorithmPage from "pages/AlgorithmPage";
 import BrowsePage from "pages/BrowsePage"
 import ErrorPage from "pages/ErrorPage";
 import NewAlgorithm from "pages/NewAlgorithmPage";
+import HelpPage from "pages/HelpPage";
 
 const router = createBrowserRouter([
     {
@@ -18,6 +19,10 @@ const router = createBrowserRouter([
     {
         path: "new-algorithm",
         element: <NewAlgorithm></NewAlgorithm>
+    },
+    {
+        path: "help",
+        element: <HelpPage></HelpPage>
     }
 ])
 

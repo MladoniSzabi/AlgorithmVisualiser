@@ -170,6 +170,11 @@ class AlgorithmPage extends Component {
                         </span>
                     </a>
                     <h1>{this.props.router.params.algorithmName}</h1>
+                    <a href="/help" title="Help" class="icon-link" target="_blank" rel="noopener noreferrer">
+                        <span class="material-symbols-outlined">
+                            help
+                        </span>
+                    </a>
                 </div>
                 <div id="code-editor">
                     <CodeEditorComponent onCodeChange={this.onCodeChange} savedCode={this.state.code} onRunCode={this.onRunCode}></CodeEditorComponent>

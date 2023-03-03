@@ -26,12 +26,19 @@ function BrowsePage() {
                     <label htmlFor="alg-search">Search:</label>
                     <input id="alg-search" type="search" value={searchBarText} list="algs-datalist" onChange={onSearchBarChange} />
                 </div>
-                <a href="/new-algorithm" id="new-algorithm" title="New Algorithm">
+
+                <a href="/help" id="help-page" title="Help" class="icon-link">
+                    <span class="material-symbols-outlined">
+                        help
+                    </span>
+                </a>
+
+                <a href="/new-algorithm" id="new-algorithm" title="New Algorithm" class="icon-link">
                     <span className="material-symbols-outlined">
                         add_circle
                     </span>
                 </a>
-            </nav>
+            </nav >
             <datalist id="algs-datalist">
                 {Object.entries(graphList).map(([key, value]) => <option value={key} key={key}>{key}</option>)}
             </datalist>
