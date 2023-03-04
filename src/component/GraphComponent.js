@@ -36,6 +36,7 @@ class GraphComponent extends Component {
         this.onAttributeChange = this.onAttributeChange.bind(this)
         this.addNewAttribute = this.addNewAttribute.bind(this)
         this.onSigmaChanged = this.onSigmaChanged.bind(this)
+        this.deleteAttribute = this.deleteAttribute.bind(this)
     }
 
     onSigmaChanged(newSigma) {
@@ -99,7 +100,7 @@ class GraphComponent extends Component {
         this.unselectNode()
         this.unselectEdge()
         this.setState({ selectedNode: node })
-        let size = this.sigma.getGraph().getNodeAttribute(node, "size")
+        let size = this.sigma.getGraph().getNodeAttribute(node, "size") || NODE_DEFAULT_SIZE
         this.sigma.getGraph().setNodeAttribute(node, "size", size * 1.5)
 
         return node
@@ -137,11 +138,9 @@ class GraphComponent extends Component {
     clickNode(event) {
         if (this.state.selectedNode === event.node) {
             this.unselectNode()
-            this.preventDefault(event.event)
-            return
+        } else {
+            this.selectNode(event.node)
         }
-
-        this.selectNode(event.node)
         this.preventDefault(event.event)
     }
 
@@ -342,10 +341,31 @@ class GraphComponent extends Component {
         }
 
         let newAttribute = prompt("Enter name of new attribute: ")
+        if (!newAttribute) {
+            return
+        }
+
         if (this.state.selectedNode)
             this.sigma.getGraph().setNodeAttribute(this.state.selectedNode, newAttribute, "")
         else
             this.sigma.getGraph().setEdgeAttribute(this.state.selectedEdge, newAttribute, "")
+        this.forceUpdate()
+        this.onGraphChanged()
+    }
+
+    deleteAttribute(key) {
+        if (!this.props.isInteractive) {
+            return
+        }
+
+        let c = window.confirm("Are you sure you want to delete this attribute?")
+        if (c) {
+            if (this.state.selectedNode)
+                this.sigma.getGraph().removeNodeAttribute(this.state.selectedNode, key)
+            else
+                this.sigma.getGraph().removeEdgeAttribute(this.state.selectedEdge, key)
+        }
+
         this.forceUpdate()
         this.onGraphChanged()
     }
@@ -356,22 +376,34 @@ class GraphComponent extends Component {
         let attributes = null
         //const MANDATORY_ATTRIBUTES = ['size', 'color', 'x', 'y']
         if (this.state.selectedNode) {
-            attributes = this.sigma.getGraph().getNodeAttributes(this.state.selectedNode)
-            attributes.size = attributes.size || NODE_DEFAULT_SIZE * 1.5
+            attributes = JSON.parse(JSON.stringify(this.sigma.getGraph().getNodeAttributes(this.state.selectedNode)))
+            attributes.size = attributes.size / 1.5 || NODE_DEFAULT_SIZE
+            if (this.hoveredNode === this.state.selectedNode) {
+                attributes.size /= 2
+            }
         } else if (this.state.selectedEdge) {
-            attributes = this.sigma.getGraph().getEdgeAttributes(this.state.selectedEdge)
-            attributes.size = attributes.size || EDGE_DEFAULT_SIZE * 1.5
+            attributes = JSON.parse(JSON.stringify(this.sigma.getGraph().getEdgeAttributes(this.state.selectedEdge)))
+            attributes.size = attributes.size / 1.5 || EDGE_DEFAULT_SIZE
+            if (this.hoveredEdge === this.state.selectedEdge) {
+                attributes.size /= 2
+            }
         }
 
         if (attributes) {
             propertyControls = <ControlsContainer id="property-controls" position={"bottom-right"}>
                 {Object.keys(attributes).map((key) =>
                     <div className="property-control" key={String(this.state.selectedNode) + ":" + String(key)}>
-                        <p>{key}: <input onChange={(event) => this.onAttributeChange(key, event)} value={attributes[key]} /></p>
+                        <p>
+                            {key}:
+                            <input onChange={(event) => this.onAttributeChange(key, event)} value={attributes[key]} />
+                            <span onClick={() => this.deleteAttribute(key)} class="material-symbols-outlined google-material-button">
+                                close
+                            </span>
+                        </p>
                     </div>
                 )}
 
-                <span onClick={this.addNewAttribute} className="material-symbols-outlined" id="add-attribute">add_circle</span>
+                <span onClick={this.addNewAttribute} className="material-symbols-outlined google-material-button">add_circle</span>
             </ControlsContainer>
         }
 
