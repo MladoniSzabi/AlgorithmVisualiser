@@ -50,11 +50,7 @@
     display: flex;
 }
 
-#algorithm_name a {
-    margin: auto;
-}
-
-#algorithm_name a span {
+.back-button span {
     font-size: 3em;
 }
 

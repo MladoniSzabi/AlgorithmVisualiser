@@ -1,0 +1,34 @@
+.title-bar {
+    grid-area: header;
+}
+
+.title-bar h1 {
+    flex-grow: 1;
+    text-align: center;
+}
+
+#help-page {
+    display: grid;
+    grid-template-columns: 1fr max-content max(1fr, 1024px) 1fr;
+    grid-template-rows: auto 1fr;
+    grid-template-areas:
+        'header header header header'
+        '. toc content .';
+    width: 100vw;
+    height: 100vh;
+    color: #4d4d4c
+}
+
+#table-of-content {
+    padding: 1em;
+    grid-area: toc;
+}
+
+#content {
+    grid-area: content;
+}
+
+#help-page a {
+    color: black;
+    text-decoration: underline dotted black;
+}

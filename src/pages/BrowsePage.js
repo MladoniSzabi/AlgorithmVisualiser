@@ -21,13 +21,13 @@ function BrowsePage() {
 
     return (
         <>
-            <nav>
+            <nav class="title-bar">
                 <div id="search-bar">
                     <label htmlFor="alg-search">Search:</label>
                     <input id="alg-search" type="search" value={searchBarText} list="algs-datalist" onChange={onSearchBarChange} />
                 </div>
 
-                <a href="/help" id="help-page" title="Help" class="icon-link">
+                <a href="/help" title="Help" class="icon-link help-page-link">
                     <span class="material-symbols-outlined">
                         help
                     </span>

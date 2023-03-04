@@ -1,4 +1,4 @@
-nav {
+.title-bar {
     width: calc(100vw - 2em);
     padding: 0.5em 1em;
     border-bottom: solid 2px black;
@@ -29,4 +29,8 @@ nav {
 .icon-link span {
     font-size: 2.5em;
     margin: auto 0.25em;
+}
+
+.icon-link {
+    margin: auto;
 }

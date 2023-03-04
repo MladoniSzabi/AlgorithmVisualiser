@@ -164,7 +164,7 @@ class AlgorithmPage extends Component {
         return (
             <div id="algorithm">
                 <div id="algorithm_name">
-                    <a href="/" >
+                    <a href="/" class="back-button icon-link" >
                         <span className="material-symbols-outlined">
                             arrow_back
                         </span>
