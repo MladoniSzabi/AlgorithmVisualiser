@@ -48,9 +48,10 @@
     grid-area: header;
     border-bottom: 2px solid #555;
     display: flex;
+    align-items: center;
 }
 
-.back-button span {
+#algorithm_name span {
     font-size: 3em;
 }
 

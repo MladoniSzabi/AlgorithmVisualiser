@@ -33,10 +33,14 @@ function BrowsePage() {
                     </span>
                 </a>
 
-                <a href="/new-algorithm" id="new-algorithm" title="New Algorithm" class="icon-link">
+                <a href="/new-algorithm" title="New Algorithm" class="icon-link">
                     <span className="material-symbols-outlined">
                         add_circle
                     </span>
+                </a>
+
+                <a href="https://github.com/MladoniSzabi/AlgorithmVisualiser" class="icon-link">
+                    <img src="/github.png" alt="Link to Github"></img>
                 </a>
             </nav >
             <datalist id="algs-datalist">
