@@ -266,6 +266,7 @@ class GraphComponent extends Component {
         y += this.sigma.getGraph().getNodeAttribute(this.state.selectedNode, "y")
         this.sigma.getGraph().setNodeAttribute(this.state.selectedNode, "y", y)
         this.onGraphChanged()
+        this.forceUpdate()
     }
 
     keydown(event) {
@@ -319,6 +320,7 @@ class GraphComponent extends Component {
             this.sigma.getGraph().setNodeAttribute(this.draggedNode, "y", pos.y)
             this.preventDefault(event)
             this.onGraphChanged()
+            this.forceUpdate()
         }
     }
 
