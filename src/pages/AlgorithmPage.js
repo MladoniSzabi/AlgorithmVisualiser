@@ -127,7 +127,7 @@ class AlgorithmPage extends Component {
 
     onHistoryIndexChanged(event) {
         if (event.eventPhase === 3) {
-            this.setState({ historyIndex: event.target.value })
+            this.setState({ historyIndex: Number(event.target.value) })
         }
     }
 
