@@ -190,7 +190,7 @@ class AlgorithmPage extends Component {
                 </div>
                 <div id="graph-visualisation">
                     {graph && <GraphComponent onGraphChanged={this.onGraphChanged} isInteractive={isInteractive} ref={this.graphComponentRef} graph={graph}></GraphComponent>}
-                    {this.state.historyIndex !== -1 && <button id="reset-history" onClick={this.resetHistory}><img src="reset.svg" alt="reset" /></button>}
+                    {this.state.historyIndex !== -1 && <button id="reset-history" onClick={this.resetHistory}><img src="/reset.svg" alt="reset" /></button>}
                 </div>
                 <div id="code-output">{output.map((el, index) => <p key={index}>{el}</p>)}</div>
             </div>
