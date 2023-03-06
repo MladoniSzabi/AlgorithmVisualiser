@@ -23,3 +23,7 @@
     background-color: #aaa;
     border-radius: 100%;
 }
+
+.property-name {
+    padding-right: 1ch;
+}

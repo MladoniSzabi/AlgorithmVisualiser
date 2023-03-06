@@ -394,7 +394,7 @@ class GraphComponent extends Component {
                 {Object.keys(attributes).map((key) =>
                     <div className="property-control" key={String(this.state.selectedNode) + ":" + String(key)}>
                         <p>
-                            {key}:
+                            <span class="property-name">{key}:</span>
                             <input onChange={(event) => this.onAttributeChange(key, event)} value={attributes[key]} />
                             <span onClick={() => this.deleteAttribute(key)} class="material-symbols-outlined google-material-button">
                                 close
