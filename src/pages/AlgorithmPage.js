@@ -86,7 +86,9 @@ class AlgorithmPage extends Component {
     }
 
     onKeyDown(event) {
-        console.log(event.key)
+        if (event.key === "Enter" && event.ctrlKey && !event.altKey && !event.shiftKey) {
+            this.onRunCode(this.state.code)
+        }
         if (event.key === "s" && event.ctrlKey && !event.altKey && !event.shiftKey) {
             this.save()
             event.preventDefault()
